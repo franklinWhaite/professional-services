@@ -1,5 +1,6 @@
 package com.google.zetasql;
 
+import com.pso.bigquery.optimization.IdentidySelectedColumns;
 import com.pso.bigquery.optimization.analysis.QueryAnalyzer;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,14 +39,21 @@ public class IdentidySelectedColumnsTest {
     @Test
     public void selectStarSingleTableTest() {
         String query = "SELECT * FROM `project.dataset.table1`";
-        String recommendations = IdentidySelectedColumns.run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
+        String recommendations = new IdentidySelectedColumns().run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
         assertEquals("All columns on table: project.dataset.table1 are being selected. Please be sure that all columns are needed" , recommendations);
+    }
+
+    @Test
+    public void noRecommendationTest() {
+        String query = "SELECT col1 FROM `project.dataset.table1`";
+        String recommendations = new IdentidySelectedColumns().run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
+        assertEquals("" , recommendations);
     }
 
     @Test
     public void selectEachColSingleTableTest() {
         String query = "SELECT col1, col2 FROM `project.dataset.table1`";
-        String recommendations = IdentidySelectedColumns.run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
+        String recommendations = new IdentidySelectedColumns().run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
         assertEquals("All columns on table: project.dataset.table1 are being selected. Please be sure that all columns are needed" , recommendations);
     }
 
@@ -60,8 +68,24 @@ public class IdentidySelectedColumnsTest {
                         "  `project.dataset.table1` t1\n" +
                         "LEFT JOIN\n" +
                         "  `project.dataset.table2` t2\n ON t1.col1 = t2.col2";
-        String recommendations = IdentidySelectedColumns.run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
+        String recommendations = new IdentidySelectedColumns().run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
         assertEquals("All columns on table: project.dataset.table1 are being selected. Please be sure that all columns are needed" , recommendations);
+    }
+
+    @Test
+    public void selectStarBothTablesWithJoinTest() {
+        String query =
+                "\n" +
+                        "SELECT " +
+                        "   t1.*, " +
+                        "   t2.col1, t2.col2, " +
+                        "FROM \n" +
+                        "  `project.dataset.table1` t1\n" +
+                        "LEFT JOIN\n" +
+                        "  `project.dataset.table2` t2\n ON t1.col1 = t2.col2";
+        String recommendations = new IdentidySelectedColumns().run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
+        assertEquals("All columns on table: project.dataset.table1 are being selected. Please be sure that all columns are needed\n" +
+                "All columns on table: project.dataset.table2 are being selected. Please be sure that all columns are needed" , recommendations);
     }
 
     @Test
@@ -76,7 +100,7 @@ public class IdentidySelectedColumnsTest {
                         "  (SELECT * FROM `project.dataset.table1`) t1\n" +
                         "LEFT JOIN\n" +
                         "  `project.dataset.table2` t2\n ON t1.col1 = t2.col2";
-        String recommendations = IdentidySelectedColumns.run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
+        String recommendations = new IdentidySelectedColumns().run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
         assertEquals("All columns on table: project.dataset.table1 are being selected. Please be sure that all columns are needed" , recommendations);
     }
 

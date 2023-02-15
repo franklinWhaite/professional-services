@@ -9,9 +9,7 @@ public interface BasePatternDetector {
     BigQueryTableService bigQueryTableService = BigQueryTableService.buildDefault();
     QueryAnalyzer parser = new QueryAnalyzer(bigQueryTableService);
 
-    public static String run(String query, String billingProjectId, SimpleCatalog catalog, QueryAnalyzer.CatalogScope catalogScope){
-        return "no optimization opportunity found";
-    };
+    String run(String query, String billingProjectId, SimpleCatalog catalog, QueryAnalyzer.CatalogScope catalogScope);
 
 
 }

@@ -2,7 +2,6 @@ package com.pso.bigquery.optimization;
 
 import com.google.zetasql.*;
 import com.pso.bigquery.optimization.analysis.QueryAnalyzer;
-import com.pso.bigquery.optimization.catalog.CatalogUtils;
 
 import java.util.List;
 
@@ -36,14 +35,14 @@ public class Main {
         String query =
                 "\n" +
                         "SELECT " +
-                        "   t1.*, " +
+                        "   t1.col1, " +
                         "   t2.col2 " +
                         "FROM \n" +
-                        "  (SELECT * FROM `project.dataset.table1`) t1\n" +
+                        "  (SELECT col1 FROM `project.dataset.table1`) t1\n" +
                         "LEFT JOIN\n" +
                         "  `project.dataset.table2` t2\n ON t1.col1 = t2.col2";
 
-        System.out.println(IdentidySelectedColumns.run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL));
+        System.out.println(new IdentidySelectedColumns().run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL));
     }
 
 }
