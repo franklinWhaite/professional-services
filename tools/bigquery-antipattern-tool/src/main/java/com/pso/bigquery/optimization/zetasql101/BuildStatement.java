@@ -4,55 +4,62 @@ import com.google.zetasql.*;
 import com.google.zetasql.resolvedast.ResolvedNodes;
 
 import java.util.List;
+import com.google.zetasql.Analyzer;
+import com.google.zetasql.AnalyzerOptions;
+import com.google.zetasql.LanguageOptions;
+import com.google.zetasql.SimpleCatalog;
+import com.google.zetasql.SimpleColumn;
+import com.google.zetasql.SimpleTable;
+import com.google.zetasql.TypeFactory;
+import com.google.zetasql.ZetaSQLBuiltinFunctionOptions;
+import com.google.zetasql.ZetaSQLType.TypeKind;
+import com.google.zetasql.resolvedast.ResolvedNodes.ResolvedStatement;
+import java.util.List;
 
-public class BuildQueryFromResolvedStmnt {
-
+public class BuildStatement {
 
     private static AnalyzerOptions getAnalyzerOptions() {
         LanguageOptions languageOptions = new LanguageOptions()
                 .enableMaximumLanguageFeatures();
         languageOptions.setSupportsAllStatementKinds();
-
         AnalyzerOptions analyzerOptions = new AnalyzerOptions();
         analyzerOptions.setLanguageOptions(languageOptions);
-        analyzerOptions.setCreateNewColumnForEachProjectedOutput(true);
+
         return analyzerOptions;
     }
 
     public static void main(String[] args) {
         SimpleCatalog catalog = new SimpleCatalog("catalog");
         catalog.addZetaSQLFunctions(new ZetaSQLBuiltinFunctionOptions());
-        SimpleColumn column1 = new SimpleColumn(
-                "project.dataset.table",
-                "col1",
-                TypeFactory.createSimpleType(ZetaSQLType.TypeKind.TYPE_STRING)
+
+        SimpleCatalog project = catalog.addNewSimpleCatalog("project");
+        SimpleCatalog dataset = project.addNewSimpleCatalog("dataset");
+
+        SimpleTable table = new SimpleTable(
+                "project.dataset.TableA",
+                List.of(
+                        new SimpleColumn(
+                                "TableA",
+                                "Column1",
+                                TypeFactory.createSimpleType(TypeKind.TYPE_STRING)
+                        )
+                )
         );
-        SimpleColumn column2 = new SimpleColumn(
-                "project.dataset.table",
-                "col2",
-                TypeFactory.createSimpleType(ZetaSQLType.TypeKind.TYPE_STRING)
-        );
-        SimpleTable table1 = new SimpleTable("project.dataset.table1", List.of(column1, column2));
-        SimpleTable table2 = new SimpleTable("project.dataset.table2", List.of(column1, column2));
-        SimpleTable table3 = new SimpleTable("project.dataset.table3", List.of(column1, column2));
-        catalog.addSimpleTable(table1);
-        catalog.addSimpleTable(table2);
-        catalog.addSimpleTable(table3);
+        table.setFullName("project.dataset.TableA");
 
-        AnalyzerOptions analyzerOptions = getAnalyzerOptions();
+        dataset.addSimpleTable("TableA", table);
 
-        String query =
-                "\n" +
-                        "SELECT " +
-                        "   * " +
-                        "FROM \n" +
-                        "  `project.dataset.table1` t1\n" ;
+        String sql = "SELECT * FROM project.dataset.TableA WHERE Column1 = 'Hello World!';";
 
-        ResolvedNodes.ResolvedStatement resolvedStatement = Analyzer.analyzeStatement(
-                query, analyzerOptions, catalog
-        );
+        ResolvedStatement statement = Analyzer.analyzeStatement(sql, getAnalyzerOptions(), catalog);
 
-        System.out.println(resolvedStatement.debugString());
+        String rebuiltSql = Analyzer.buildStatement(statement, catalog);
+
+        System.out.printf("Original SQL: \n%s\n\n", sql);
+
+        System.out.printf("AST: \n%s\n\n", statement.debugString());
+
+        System.out.printf("Rebuild SQL: \n%s\n\n", rebuiltSql);
 
     }
 }

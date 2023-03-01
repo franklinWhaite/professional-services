@@ -1,14 +1,21 @@
-package com.pso.bigquery.optimization.analysis.visitors;
+package com.pso.bigquery.optimization.analysis.visitors.crossjoin;
 
 import com.google.zetasql.SimpleCatalog;
-import com.google.zetasql.resolvedast.ResolvedNode;
 import com.google.zetasql.resolvedast.ResolvedNodes.*;
+import com.pso.bigquery.optimization.analysis.visitors.BaseAnalyzerVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class CrossJoinVisitor extends BaseAnalyzerVisitor {
 
+    private final String INNER_JOIN_TYPE = "INNER";
+
+    Stack<ResolvedExpr> filterStack = new Stack<ResolvedExpr>();
+    FindTableInFilterExprVisitor findTableInFilterExprVisitor = null;
+
+    private List<CrossJoin> crossJoinList = new ArrayList<>();
     public CrossJoinVisitor(String projectId, SimpleCatalog catalog) {
         super(projectId, catalog);
     }
@@ -18,52 +25,35 @@ public class CrossJoinVisitor extends BaseAnalyzerVisitor {
         super.visit(resolvedJoinScan);
     }
 
+    public void visit(ResolvedFilterScan resolvedFilterScan) {
+        filterStack.push(resolvedFilterScan.getFilterExpr());
+        super.visit(resolvedFilterScan);
+        filterStack.pop();
+    }
+
     public void checkForCrossJoin(ResolvedJoinScan resolvedJoinScan) {
         ResolvedExpr joinsExpr = resolvedJoinScan.getJoinExpr();
-        if(joinsExpr == null && resolvedJoinScan.getJoinType().toString().equals("INNER")) {
-            ResolvedScan leftNode = resolvedJoinScan.getLeftScan();
-            ResolvedScan rightNode = resolvedJoinScan.getRightScan();
-            new CrossJoinChildNode(leftNode);
-            new CrossJoinChildNode(rightNode);
-        }
-    }
+        if(joinsExpr == null && resolvedJoinScan.getJoinType().toString().equals(INNER_JOIN_TYPE) && filterStack.size()>0) {
 
+            CrossJoinChildNode leftNode = new CrossJoinChildNode(resolvedJoinScan.getLeftScan());
+            CrossJoinChildNode rightNode = new CrossJoinChildNode(resolvedJoinScan.getRightScan());
 
-    public String getResult() {
-        return "";
-    }
+            findTableInFilterExprVisitor = new FindTableInFilterExprVisitor(super.getProjectId(), super.getCatalog());
+            findTableInFilterExprVisitor.setLeftSideTableList(leftNode.getTableNameList());
+            findTableInFilterExprVisitor.setRightSideTableList(rightNode.getTableNameList());
 
-    private class CrossJoinChildNode {
-        public String type;
-        public String name;
-        CrossJoinChildNode(ResolvedScan resolvedScan) {
-            setup(resolvedScan);
-        }
-
-        private void setup(ResolvedScan resolvedScan) {
-            if(resolvedScan instanceof ResolvedTableScan) {
-                type = "TABLE";
-                name = ((ResolvedTableScan) resolvedScan).getTable().getFullName();
-            } else if (resolvedScan instanceof ResolvedJoinScan) {
-                type = "JOIN_SCAN";
-                name = null;
-            } else if (resolvedScan instanceof ResolvedProjectScan) {
-                type = "SUBQUERY";
-                name = null;
+            filterStack.peek().accept(findTableInFilterExprVisitor);
+            if(findTableInFilterExprVisitor.result()){
+                crossJoinList.add(new CrossJoin(leftNode, rightNode));
             }
+
+
         }
 
     }
 
-    private class CrossJoin() {
-        public CrossJoinChildNode left;
-        public CrossJoinChildNode right;
-
-        CrossJoin(CrossJoinChildNode left, CrossJoinChildNode right) {
-            this.left = left;
-            this.right = right;
-
-        }
+    public List<CrossJoin>  getResult() {
+        return crossJoinList;
     }
 
 

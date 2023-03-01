@@ -39,22 +39,40 @@ public class PrintDebugStringExample {
 
         AnalyzerOptions analyzerOptions = getAnalyzerOptions();
 
-        String query =
-                "\n" +
-                        "SELECT " +
-                        "   t1.*, " +
-                        "   t2.col2 " +
-                        "FROM \n" +
-                        "  (SELECT * FROM `project.dataset.table1`) t1\n" +
-                        "LEFT JOIN\n" +
-                        "  `project.dataset.table2` t2\n ON t1.col1 = t2.col2";
+//        String query = "SELECT \n" +
+//                "    t1.col1\n" +
+//                "FROM    \n" +
+//                "    `project.dataset.table1` t1\n" +
+//                "INNER JOIN \n" +
+//                "    `project.dataset.table2` t2 ON t1.col1 = t2.col1\n" +
+//                "CROSS JOIN \n" +
+//                "    `project.dataset.table3` t3 \n" +
+//                "INNER JOIN \n" +
+//                "    `project.dataset.table2` t22 ON t1.col1 = t22.col1\n" +
+//                "WHERE\n" +
+//                "    t1.col1 != 'a'\n" +
+//                "    AND t1.col1 = t3.col1\n" +
+//                "    AND t3.col2 != 'b'" ;
+
+        String query = "SELECT " +
+            "   t1.col1 " +
+            "FROM " +
+            "   `project.dataset.table1` t1 " +
+            "INNER JOIN " +
+            "    `project.dataset.table2` t2 " +
+            " ON t1.col2 = t2.col2 " +
+            "CROSS JOIN " +
+            "    `project.dataset.table3` t3  " +
+            "WHERE " +
+            "   t1.col1 = t3.col1 ";
+                //"ON t1.col2 = t2.col2 " +
+               ;
 
         ResolvedNodes.ResolvedStatement resolvedStatement = Analyzer.analyzeStatement(
                 query, analyzerOptions, catalog
         );
 
         System.out.println(resolvedStatement.debugString());
-
 
     }
 }

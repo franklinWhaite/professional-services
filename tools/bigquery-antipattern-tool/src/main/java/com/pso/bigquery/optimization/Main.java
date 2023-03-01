@@ -32,17 +32,20 @@ public class Main {
         catalog.addSimpleTable(table2);
         catalog.addSimpleTable(table3);
 
-        String query =
-                "\n" +
-                        "SELECT " +
-                        "   t1.col1, " +
-                        "   t2.col2 " +
-                        "FROM \n" +
-                        "  (SELECT col1 FROM `project.dataset.table1`) t1\n" +
-                        "LEFT JOIN\n" +
-                        "  `project.dataset.table2` t2\n ON t1.col1 = t2.col2";
+        String query = "SELECT " +
+            "   t1.col1 " +
+            "FROM " +
+            "   `project.dataset.table1` t1 " +
+            "INNER JOIN " +
+            "    `project.dataset.table2` t2 " +
+            " ON t1.col2 = t2.col2 " +
+            "CROSS JOIN " +
+            "    `project.dataset.table3` t3  " +
+            "WHERE " +
+            "   t1.col1 = t3.col1 ";
 
-        System.out.println(new IdentidySelectedColumns().run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL));
+//        System.out.println(new IdentidySelectedColumns().run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL));
+        System.out.println(new IdentifyCrossJoin().run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL));
     }
 
 }
