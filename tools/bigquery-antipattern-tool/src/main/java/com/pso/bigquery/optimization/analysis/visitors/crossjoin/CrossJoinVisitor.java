@@ -3,7 +3,6 @@ package com.pso.bigquery.optimization.analysis.visitors.crossjoin;
 import com.google.zetasql.SimpleCatalog;
 import com.google.zetasql.resolvedast.ResolvedNodes.*;
 import com.pso.bigquery.optimization.analysis.visitors.BaseAnalyzerVisitor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;

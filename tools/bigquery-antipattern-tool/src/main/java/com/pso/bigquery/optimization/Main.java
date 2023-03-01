@@ -1,11 +1,10 @@
 package com.pso.bigquery.optimization;
 
+import static com.pso.bigquery.optimization.util.ZetaSQLHelperConstants.*;
+
 import com.google.zetasql.*;
 import com.pso.bigquery.optimization.analysis.QueryAnalyzer;
-
 import java.util.List;
-
-import static com.pso.bigquery.optimization.util.ZetaSQLHelperConstants.*;
 
 public class Main {
 

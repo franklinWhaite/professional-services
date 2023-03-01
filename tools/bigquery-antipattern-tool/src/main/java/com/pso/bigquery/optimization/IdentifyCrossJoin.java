@@ -3,12 +3,10 @@ package com.pso.bigquery.optimization;
 import com.google.zetasql.SimpleCatalog;
 import com.pso.bigquery.optimization.analysis.QueryAnalyzer;
 import com.pso.bigquery.optimization.analysis.visitors.crossjoin.CrossJoin;
-import com.pso.bigquery.optimization.analysis.visitors.crossjoin.CrossJoinChildNode;
 import com.pso.bigquery.optimization.analysis.visitors.crossjoin.CrossJoinVisitor;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 public class IdentifyCrossJoin implements BasePatternDetector {
 

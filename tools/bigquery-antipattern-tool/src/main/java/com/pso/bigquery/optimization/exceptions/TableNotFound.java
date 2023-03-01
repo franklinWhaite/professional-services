@@ -32,6 +32,4 @@ public class TableNotFound extends QueryPatternAnalyzerException {
   public TableReference getTableRef() {
     return this.tableRef;
   }
-
-
 }

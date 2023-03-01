@@ -2,7 +2,6 @@ package com.pso.bigquery.optimization.zetasql101;
 
 import com.google.zetasql.*;
 import com.google.zetasql.resolvedast.ResolvedNodes;
-
 import java.util.List;
 
 public class PrintDebugStringExample {

@@ -23,11 +23,10 @@ import com.google.zetasql.LanguageOptions;
 import com.google.zetasql.ParseResumeLocation;
 import com.google.zetasql.SimpleCatalog;
 import com.google.zetasql.resolvedast.ResolvedNodes.ResolvedStatement;
-import com.pso.bigquery.optimization.analysis.visitors.BaseAnalyzerVisitor;
+import com.google.zetasql.resolvedast.ResolvedNodes.Visitor;
 import com.pso.bigquery.optimization.analysis.visitors.CreateJsonQueryStructureVisitor;
 import com.pso.bigquery.optimization.analysis.visitors.ExtractScansVisitor;
 import com.pso.bigquery.optimization.analysis.visitors.ExtractScansVisitor.QueryScan;
-import com.pso.bigquery.optimization.analysis.visitors.SelectedColumnsVisitor;
 import com.pso.bigquery.optimization.catalog.BigQuerySchemaConverter;
 import com.pso.bigquery.optimization.catalog.BigQueryTableParser;
 import com.pso.bigquery.optimization.catalog.BigQueryTableService;
@@ -38,7 +37,6 @@ import io.vavr.collection.Seq;
 import io.vavr.control.Try;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.google.zetasql.resolvedast.ResolvedNodes.Visitor;
 
 /**
  * The QueryAnalyzer parses a BigQuery job using ZetaSQL and extracts information from it. It
@@ -170,7 +168,12 @@ public class QueryAnalyzer {
     return Try.success(visitor.getResult());
   }
 
-  public void visitQuery(String billingProjectId, String query, SimpleCatalog catalog, CatalogScope catalogScope, Visitor visitor) {
+  public void visitQuery(
+      String billingProjectId,
+      String query,
+      SimpleCatalog catalog,
+      CatalogScope catalogScope,
+      Visitor visitor) {
     ParseResumeLocation parseResumeLocation = new ParseResumeLocation(query);
     if (catalogScope.equals(CatalogScope.QUERY)) {
 
@@ -178,22 +181,21 @@ public class QueryAnalyzer {
       if (tryUpdateCatalog.isFailure()) {
         throw new CatalogFailure(tryUpdateCatalog.getCause().getMessage());
       }
-
     }
 
     AnalyzerOptions analyzerOpts = this.getAnalyzerOptions();
     while (hasNextStatement(parseResumeLocation)) {
       Try<ResolvedStatement> tryParsedStatement =
-              Try.of(() -> Analyzer.analyzeNextStatement(parseResumeLocation, analyzerOpts, catalog));
+          Try.of(() -> Analyzer.analyzeNextStatement(parseResumeLocation, analyzerOpts, catalog));
 
       if (tryParsedStatement.isFailure()) {
         throw new ParsedStatementFailure(tryParsedStatement.getCause().getMessage());
       }
 
       tryParsedStatement.forEach(
-              resolvedStatement -> {
-                resolvedStatement.accept(visitor);
-              });
+          resolvedStatement -> {
+            resolvedStatement.accept(visitor);
+          });
     }
   }
 
