@@ -59,6 +59,25 @@ public class IdentidySelectedColumnsTest {
   }
 
   @Test
+  public void selectStarTwoTablesTest() {
+    String expected =
+        "All columns on table: project.dataset.table1 are being selected. Please be sure that all columns are needed\n"
+            + "All columns on table: project.dataset.table2 are being selected. Please be sure that all columns are needed";
+    String query = "SELECT " +
+        "   t1.*, t2.* " +
+        "FROM " +
+        "   `project.dataset.table1` t1 " +
+        "cross JOIN " +
+        "    `project.dataset.table2` t2 " +
+        "WHERE " +
+        "   t1.col1 = t2.col1 ";
+    String recommendations =
+        new IdentidySelectedColumns()
+            .run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
+    assertEquals(expected, recommendations);
+  }
+
+  @Test
   public void noRecommendationTest() {
     String query = "SELECT col1 FROM `project.dataset.table1`";
     String recommendations =

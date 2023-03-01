@@ -22,6 +22,7 @@ import java.text.ParseException;
 import java.util.List;
 
 import static com.pso.bigquery.optimization.util.ZetaSQLHelperConstants.*;
+
 import org.apache.commons.cli.*;
 
 public class Main {
@@ -38,33 +39,33 @@ public class Main {
             "LEFT JOIN\n" +
             "  `project.dataset.table2` t2\n ON t1.col1 = t2.col2";
 
-    Options options = new Options();
-
-    Option query = Option.builder("query")
-        .argName("query")
-        .hasArg()
-        .required(true)
-        .desc("set query").build();
-    options.addOption(query);
-
-    CommandLine cmd;
-    CommandLineParser parser = new BasicParser();
-    HelpFormatter helper = new HelpFormatter();
-
-    try {
-      cmd = parser.parse(options, args);
-      if(cmd.hasOption("query")){
-        query_str = cmd.getOptionValue("query");
-        System.out.println("query detected as " + query_str);
-      }
-    } catch (org.apache.commons.cli.ParseException e) {
-      System.out.println(e.getMessage());
-      helper.printHelp("Usage:", options);
-      System.exit(0);
-    }
+    // Options options = new Options();
+    //
+    // Option query = Option.builder("query")
+    //     .argName("query")
+    //     .hasArg()
+    //     .required(true)
+    //     .desc("set query").build();
+    // options.addOption(query);
+    //
+    // CommandLine cmd;
+    // CommandLineParser parser = new BasicParser();
+    // HelpFormatter helper = new HelpFormatter();
+    //
+    // try {
+    //   cmd = parser.parse(options, args);
+    //   if(cmd.hasOption("query")){
+    //     query_str = cmd.getOptionValue("query");
+    //     System.out.println("query detected as " + query_str);
+    //   }
+    // } catch (org.apache.commons.cli.ParseException e) {
+    //   System.out.println(e.getMessage());
+    //   helper.printHelp("Usage:", options);
+    //   System.exit(0);
+    // }
 
     String billing_project = MY_PROJET;
-    SimpleCatalog catalog =  new SimpleCatalog(CATALOG_NAME);
+    SimpleCatalog catalog = new SimpleCatalog(CATALOG_NAME);
 
     catalog.addZetaSQLFunctions(new ZetaSQLBuiltinFunctionOptions());
     SimpleColumn column1 = new SimpleColumn(
@@ -84,9 +85,23 @@ public class Main {
     catalog.addSimpleTable(table2);
     catalog.addSimpleTable(table3);
 
+    query_str =
+        "SELECT " +
+            "   t1.col1 " +
+            "FROM " +
+            "   `project.dataset.table1` t1 " +
+            "CROSS JOIN " +
+            "    `project.dataset.table2` t2 " +
+            "CROSS JOIN " +
+            "    `project.dataset.table3` t3 " +
+            "WHERE " +
+            "   t1.col1 = t2.col1 "
+            + "   AND t1.col1 = t3.col1 "
+    ;
 
-
-    System.out.println(new IdentidySelectedColumns().run(query_str, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL));
+    //System.out.println(new IdentidySelectedColumns().run(query_str, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL));
+    System.out.println(new IdentifyCrossJoin().run(query_str, billing_project, catalog,
+        QueryAnalyzer.CatalogScope.MANUAL));
   }
 
 }
