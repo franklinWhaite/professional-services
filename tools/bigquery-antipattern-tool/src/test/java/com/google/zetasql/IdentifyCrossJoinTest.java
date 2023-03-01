@@ -52,10 +52,26 @@ public class IdentifyCrossJoinTest {
   }
 
   @Test
+  public void crossJoinTwoTablesNoFilterTest() {
+    String expected = "";
+    String query =
+        "SELECT "
+            + "   t1.col1 "
+            + "FROM "
+            + "   `project.dataset.table1` t1 "
+            + "CROSS JOIN "
+            + "    `project.dataset.table2` t2 ";
+
+    String recommendation =
+        new IdentifyCrossJoin()
+            .run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
+    assertEquals(expected, recommendation);
+  }
+
+  @Test
   public void crossJoinTableSubqueryTest() {
     String expected =
-        "CROSS JOIN between table project.dataset.table2 and subquery. Try to change for a INNER"
-            + " JOIN if possible.";
+        "CROSS JOIN between tables: t1 and project.dataset.table2. Try to change for a INNER JOIN if possible.";
     String query =
         "SELECT "
             + "   t1.col1 "
@@ -74,7 +90,7 @@ public class IdentifyCrossJoinTest {
   @Test
   public void crossJoinTwoSubqueries() {
     String expected =
-        "CROSS JOIN between two subqueries. Try to change for a INNER JOIN if possible.";
+        "CROSS JOIN between tables: t1 and t2. Try to change for a INNER JOIN if possible.";
     String query =
         "SELECT "
             + "   t1.col1 "
@@ -93,8 +109,7 @@ public class IdentifyCrossJoinTest {
   @Test
   public void crossJoinSeveralJoins() {
     String expected =
-        "CROSS JOIN with table: project.dataset.table3. Try to change for a INNER JOIN if"
-            + " possible.";
+        "CROSS JOIN between tables: project.dataset.table1 and project.dataset.table3. Try to change for a INNER JOIN if possible.";
     String query =
         "SELECT "
             + "   t1.col1 "
@@ -114,7 +129,7 @@ public class IdentifyCrossJoinTest {
 
   @Test
   public void crossJoinSeveralJoinsAndSubquery() {
-    String expected = "CROSS JOIN in query. Try to change for a INNER JOIN if possible.";
+    String expected = "CROSS JOIN between tables: project.dataset.table1 and t3. Try to change for a INNER JOIN if possible.";
     String query =
         "SELECT "
             + "   t1.col1 "
@@ -131,4 +146,38 @@ public class IdentifyCrossJoinTest {
             .run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
     assertEquals(expected, recommendation);
   }
+
+  @Test
+  public void crossJoinNestedCrossJoin() {
+    String expected =
+        "CROSS JOIN between tables: project.dataset.table1 and project.dataset.table2. Try to"
+            + " change for a INNER JOIN if possible.";
+    String query =
+        "SELECT "
+            + "   t1.col1 "
+            + "FROM "
+            + "   `project.dataset.table1` t1 "
+            + "INNER JOIN "
+            + "    `project.dataset.table2` t2 ON t1.col2 = t2.col2 "
+            + "INNER JOIN "
+            + "    `project.dataset.table3` t3 ON t1.col1 = t3.col1 "
+            + "INNER JOIN "
+            + " ( "
+            + "   SELECT "
+            + "      t1.col1 "
+            + "    FROM "
+            + "       `project.dataset.table1` t1 "
+            + "    CROSS JOIN "
+            + "       `project.dataset.table2` t2 "
+            + "    WHERE "
+            + "        t1.col1 = t2.col1 "
+            + " ) t11 ON t1.col1 = t11.col1 "
+            + "WHERE "
+            + "   t1.col1 = t3.col1 ";
+    String recommendation =
+        new IdentifyCrossJoin()
+            .run(query, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL);
+    assertEquals(expected, recommendation);
+  }
+
 }
