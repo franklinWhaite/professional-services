@@ -28,6 +28,9 @@ import org.apache.commons.lang3.StringUtils;
 
 public class IdentidySelectedColumns implements BasePatternDetector {
 
+  private static final String SELECTED_COLUMNS_MESSAGE =
+      "All columns on table: %s are being selected. Please be sure that all columns are needed";
+
   public String run(
       String query,
       String billingProjectId,
@@ -62,11 +65,7 @@ public class IdentidySelectedColumns implements BasePatternDetector {
     Table tableInCatalog = catalog.findTable(Arrays.asList(tableName));
 
     if (tableInCatalog.getColumnCount() == tableWithSelectedCol.getSelectedColumns().size()) {
-      result.add(
-          String.format(
-              "All columns on table: %s are being selected. Please be sure that all columns are"
-                  + " needed",
-              tableName));
+      result.add(String.format(SELECTED_COLUMNS_MESSAGE, tableName));
     }
   }
 }
