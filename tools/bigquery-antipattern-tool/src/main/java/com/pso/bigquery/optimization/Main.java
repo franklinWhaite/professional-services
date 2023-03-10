@@ -85,23 +85,21 @@ public class Main {
     catalog.addSimpleTable(table2);
     catalog.addSimpleTable(table3);
 
-    query_str =
-        "SELECT " +
-            "   t1.col1 " +
-            "FROM " +
-            "   `project.dataset.table1` t1 " +
-            "CROSS JOIN " +
-            "    `project.dataset.table2` t2 " +
-            "CROSS JOIN " +
-            "    `project.dataset.table3` t3 " +
-            "WHERE " +
-            "   t1.col1 = t2.col1 "
-            + "   AND t1.col1 = t3.col1 "
+    query_str = "SELECT "
+            + "   t1.col1 "
+            + "FROM "
+            + "   `project.dataset.table1` t1 "
+            + "WHERE "
+            //+ "   col1 = 'a' "
+            + "    t1.col2 not in (select col2 from `project.dataset.table2`) "
+            //+ "   AND t1.col2 not in (select distinct col2 from `project.dataset.table2`) "
+            //+ "   AND t1.col2 in (select distinct col2 from `project.dataset.table2`) "
+            //+ "   AND (t1.col1, t1.col2) not in (select (col1, col2) from `project.dataset.table2`) "
     ;
-
     //System.out.println(new IdentidySelectedColumns().run(query_str, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL));
-    System.out.println(new IdentifyCrossJoin().run(query_str, billing_project, catalog,
-        QueryAnalyzer.CatalogScope.MANUAL));
+    // System.out.println(new IdentifyCrossJoin().run(query_str, billing_project, catalog,
+    //     QueryAnalyzer.CatalogScope.MANUAL));
+    System.out.println(new IdentifySubqueryInWhere().run(query_str, billing_project, catalog, QueryAnalyzer.CatalogScope.MANUAL));
   }
 
 }

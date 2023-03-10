@@ -58,13 +58,9 @@ public class PrintDebugStringExample {
             + "   t1.col1 "
             + "FROM "
             + "   `project.dataset.table1` t1 "
-            + "INNER JOIN "
-            + "    `project.dataset.table2` t2 "
-            + " ON t1.col2 = t2.col2 "
-            + "CROSS JOIN "
-            + "    `project.dataset.table3` t3  "
             + "WHERE "
-            + "   t1.col1 = t3.col1 ";
+            + "   t1.col2 not in (select col2 from `project.dataset.table1`) "
+            + "   AND t1.col2 not in (select distinct col2 from `project.dataset.table1`) ";
     // "ON t1.col2 = t2.col2 " +
     ;
 

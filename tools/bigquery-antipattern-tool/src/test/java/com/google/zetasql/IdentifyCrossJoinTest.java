@@ -191,6 +191,8 @@ public class IdentifyCrossJoinTest {
             + "      t1.col1 "
             + "    FROM "
             + "       `project.dataset.table1` t1 "
+            + "    INNER JOIN "
+            + "       `project.dataset.table3` t3 ON t1.col1 = t3.col1 "
             + "    CROSS JOIN "
             + "       `project.dataset.table2` t2 "
             + "    WHERE "
