@@ -171,6 +171,7 @@ being `pso.bigquery.optimization`
       └── BuildCatalogForProjectAndAnalyzeJoins.java          # Sample code that scans a query and builds catalog by adding all the tables in a given project 
 ```
 
+
 ## Runnning with docker
 ``` bash
 mvn clean
@@ -193,3 +194,4 @@ docker run -v "$HOME/.config/gcloud:/gcp/config:ro" \
   --env GOOGLE_APPLICATION_CREDENTIALS=/gcp/config/application_default_credentials.json \
   -i query-pattern-analyzer2 --folder_path "/queries"
 ``` 
+
