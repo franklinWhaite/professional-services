@@ -15,15 +15,9 @@
  */
 package com.pso.bigquery.optimization.analysis.visitors;
 
-import com.google.common.collect.ImmutableList;
 import com.google.zetasql.SimpleCatalog;
-import com.google.zetasql.resolvedast.ResolvedColumn;
 import com.google.zetasql.resolvedast.ResolvedNodes.*;
 import com.pso.bigquery.optimization.util.ZetaSQLStringParsingHelper;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import java.util.*;
 
 // Visitor instance that, given the AST, extract the scans the
@@ -32,7 +26,8 @@ import java.util.*;
 // JOIN conditions.
 public class SelectedColumnsVisitor extends BaseAnalyzerVisitor {
 
-  private final Map<String, TableWithSelectedCol> tablesWithSelectedColsMap= new HashMap<String, TableWithSelectedCol>();
+  private final Map<String, TableWithSelectedCol> tablesWithSelectedColsMap =
+      new HashMap<String, TableWithSelectedCol>();
 
   public SelectedColumnsVisitor(String projectId, SimpleCatalog catalog) {
     super(projectId, catalog);
@@ -47,11 +42,11 @@ public class SelectedColumnsVisitor extends BaseAnalyzerVisitor {
     super.visit(computedCol);
   }
 
-  private void addColumnToMap(ResolvedComputedColumn computedCol){
+  private void addColumnToMap(ResolvedComputedColumn computedCol) {
     String tableName = ZetaSQLStringParsingHelper.getTableNameFromExpr(computedCol.toString());
-    if(tableName != null) {
+    if (tableName != null) {
       String colName = computedCol.getColumn().getName();
-      if(tablesWithSelectedColsMap.containsKey(tableName)){
+      if (tablesWithSelectedColsMap.containsKey(tableName)) {
         tablesWithSelectedColsMap.get(tableName).addSelectedColumn(colName);
       } else {
         TableWithSelectedCol tableWithSelectedCol = new TableWithSelectedCol(tableName);

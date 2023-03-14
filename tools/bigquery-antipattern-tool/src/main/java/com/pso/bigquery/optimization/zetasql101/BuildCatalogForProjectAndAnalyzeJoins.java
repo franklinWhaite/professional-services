@@ -29,8 +29,7 @@ public class BuildCatalogForProjectAndAnalyzeJoins {
   public static void main(String[] args) throws InterruptedException {
     String PROJECT_ID = "pso-dev-whaite";
     // add a query that references actual tables in your projets
-    String QUERY =
-            "SELECT * FROM pso-dev-whaite.DATASET_1.test_table_1`";
+    String QUERY = "SELECT * FROM pso-dev-whaite.DATASET_1.test_table_1`";
     // Create Catalog and add all datasets in a project
     SimpleCatalog catalog = CatalogUtils.createCatalogForProject(PROJECT_ID);
 

@@ -15,6 +15,9 @@
  */
 package com.pso.bigquery.optimization.catalog;
 
+import static com.pso.bigquery.optimization.util.ZetaSQLHelperConstants.INFO_SCHEMA_COLUMNS_QUERY;
+import static com.pso.bigquery.optimization.util.ZetaSQLHelperConstants.INFO_SCHEMA_SCHEMATA_QUERY;
+
 import com.google.api.gax.paging.Page;
 import com.google.api.gax.rpc.FixedHeaderProvider;
 import com.google.api.gax.rpc.HeaderProvider;
@@ -23,14 +26,10 @@ import com.google.cloud.bigquery.Table;
 import com.google.common.collect.ImmutableMap;
 import com.google.zetasql.*;
 import com.pso.bigquery.optimization.exceptions.CatalogDuplicateDatasetNameException;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-
-import static com.pso.bigquery.optimization.util.ZetaSQLHelperConstants.INFO_SCHEMA_COLUMNS_QUERY;
-import static com.pso.bigquery.optimization.util.ZetaSQLHelperConstants.INFO_SCHEMA_SCHEMATA_QUERY;
 
 // Utility class for working with ZetaSQL catalogs on BigQuery
 public class CatalogUtils {
@@ -38,7 +37,7 @@ public class CatalogUtils {
   private static final String USER_AGENT_HEADER = "user-agent";
   private static final String USER_AGENT_VALUE = "google-pso-tool/zetasql-helper/0.0.1";
   private static final HeaderProvider HEADER_PROVIDER =
-          FixedHeaderProvider.create(ImmutableMap.of(USER_AGENT_HEADER, USER_AGENT_VALUE));
+      FixedHeaderProvider.create(ImmutableMap.of(USER_AGENT_HEADER, USER_AGENT_VALUE));
 
   private CatalogUtils() {}
 
@@ -81,7 +80,9 @@ public class CatalogUtils {
       if (e.getMessage().contains("duplicate key")) {
         throw new CatalogDuplicateDatasetNameException(
             String.format(
-                "There seems to be two datasets with the same name but different casing for: %s.\nZetaSQL is case insensitive, a catalog cannot have two datasets with the same name and different casing.",
+                "There seems to be two datasets with the same name but different casing for: %s.\n"
+                    + "ZetaSQL is case insensitive, a catalog cannot have two datasets with the"
+                    + " same name and different casing.",
                 name));
       }
     }
@@ -200,7 +201,11 @@ public class CatalogUtils {
 
   public static void addProjectToCatalog(String projectId, SimpleCatalog catalog) {
     BigQuery bigquery =
-            BigQueryOptions.newBuilder().setProjectId(projectId).setHeaderProvider(HEADER_PROVIDER).build().getService();
+        BigQueryOptions.newBuilder()
+            .setProjectId(projectId)
+            .setHeaderProvider(HEADER_PROVIDER)
+            .build()
+            .getService();
 
     Page<Dataset> datasetListPage = bigquery.listDatasets(projectId);
     Iterable<Dataset> datasetList = null;
@@ -234,9 +239,13 @@ public class CatalogUtils {
         BigQuerySchemaConverter.extractTableColumns(table));
   }
 
-  public static SimpleCatalog createCatalogForInfoSchema(String projectid){
+  public static SimpleCatalog createCatalogForInfoSchema(String projectid) {
     BigQuery bigquery =
-            BigQueryOptions.newBuilder().setProjectId(projectid).setHeaderProvider(HEADER_PROVIDER).build().getService();
+        BigQueryOptions.newBuilder()
+            .setProjectId(projectid)
+            .setHeaderProvider(HEADER_PROVIDER)
+            .build()
+            .getService();
     SimpleCatalog catalog = CatalogUtils.createEmptyCatalog();
 
     String query = String.format(INFO_SCHEMA_SCHEMATA_QUERY, projectid);
@@ -244,15 +253,21 @@ public class CatalogUtils {
     try {
       TableResult results = bigquery.query(queryConfig);
       results
-              .iterateAll()
-              .forEach(row -> row.forEach(val -> addDatasetToCatalogFromInfoSchema(val.getStringValue(), projectid, catalog, bigquery)));
+          .iterateAll()
+          .forEach(
+              row ->
+                  row.forEach(
+                      val ->
+                          addDatasetToCatalogFromInfoSchema(
+                              val.getStringValue(), projectid, catalog, bigquery)));
     } catch (BigQueryException | InterruptedException e) {
       System.out.println("Query not performed \n" + e.toString());
     }
     return catalog;
   }
 
-  public static void addDatasetToCatalogFromInfoSchema(String datasetName, String project, SimpleCatalog catalog, BigQuery bigquery) {
+  public static void addDatasetToCatalogFromInfoSchema(
+      String datasetName, String project, SimpleCatalog catalog, BigQuery bigquery) {
     try {
       String query = String.format(INFO_SCHEMA_COLUMNS_QUERY, project, datasetName);
       QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(query).build();
@@ -260,34 +275,27 @@ public class CatalogUtils {
       Iterator<FieldValueList> iter = results.getValues().iterator();
       List<SimpleColumn> simpleColumnsList = new ArrayList<SimpleColumn>();
       String currentTable = null;
-      while(iter.hasNext()){
+      while (iter.hasNext()) {
         FieldValueList val = iter.next();
-        if(currentTable==null){
+        if (currentTable == null) {
           currentTable = val.get("table_name").getStringValue();
         }
         String colName = val.get("column_name").getStringValue();
         String dataType = val.get("data_type").getStringValue();
         Type type = BigQuerySchemaConverter.parseBigQueryInformationSchemaType(dataType);
-        if(!currentTable.equals(val.get("table_name").getStringValue())){
-          //add to catalog
+        if (!currentTable.equals(val.get("table_name").getStringValue())) {
+          // add to catalog
           CatalogUtils.createTableInCatalog(
-                  catalog,
-                  project,
-                  datasetName,
-                  currentTable,
-                  simpleColumnsList);
+              catalog, project, datasetName, currentTable, simpleColumnsList);
           simpleColumnsList = new ArrayList<SimpleColumn>();
           currentTable = val.get("table_name").getStringValue();
         }
         SimpleColumn simpleColumn = new SimpleColumn(currentTable, colName, type);
         simpleColumnsList.add(simpleColumn);
-
       }
 
     } catch (BigQueryException | InterruptedException e) {
       System.out.println("Query not performed \n" + e.toString());
     }
-
   }
-
 }

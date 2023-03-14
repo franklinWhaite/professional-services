@@ -25,7 +25,6 @@ import com.google.zetasql.StructType.StructField;
 import com.google.zetasql.Type;
 import com.google.zetasql.TypeFactory;
 import com.google.zetasql.ZetaSQLType.TypeKind;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -130,18 +129,18 @@ public class BigQuerySchemaConverter {
     }
   }
 
-  public static ArrayList<String> splitStructFieldStr(String structFieldsStr){
+  public static ArrayList<String> splitStructFieldStr(String structFieldsStr) {
     ArrayList<String> resp = new ArrayList<String>();
     Stack<Character> stk = new Stack<>();
     int start = 0;
     Character currentChar = ' ';
-    for(int i =0; i<structFieldsStr.length(); i+=1){
+    for (int i = 0; i < structFieldsStr.length(); i += 1) {
       currentChar = structFieldsStr.charAt(i);
-      if(currentChar.equals('<')){
+      if (currentChar.equals('<')) {
         stk.push(currentChar);
       } else if (currentChar.equals('>')) {
         stk.pop();
-      } else if (currentChar.equals(',') && stk.empty()){
+      } else if (currentChar.equals(',') && stk.empty()) {
         resp.add(structFieldsStr.substring(start, i).trim());
         start = i + 1;
       }
@@ -153,22 +152,25 @@ public class BigQuerySchemaConverter {
   public static Type parseBigQueryInformationSchemaType(String typeStr) {
     Matcher arrayMatcher = arrayPattern.matcher(typeStr);
     Matcher structMatcher = structPattern.matcher(typeStr);
-    if(arrayMatcher.matches()) {
+    if (arrayMatcher.matches()) {
       String elementTypeStr = arrayMatcher.group(1);
       Type elementType = parseBigQueryInformationSchemaType(elementTypeStr);
       return TypeFactory.createArrayType(elementType);
-    } else if(structMatcher.matches()) {
+    } else if (structMatcher.matches()) {
       String structFieldsStr = structMatcher.group(1);
       structFieldsStr.split(",");
-      List<StructField> fields = splitStructFieldStr(structFieldsStr).stream()
+      List<StructField> fields =
+          splitStructFieldStr(structFieldsStr).stream()
               .map(String::trim)
-              .map(structFieldStr -> {
-                List<String> structFieldStrArr = List.of(structFieldStr.split(" "));
-                String fieldName = structFieldStrArr.get(0);
-                String fieldTypeStr = String.join(" ",structFieldStrArr.subList(1, structFieldStrArr.size()));
-                Type fieldType = parseBigQueryInformationSchemaType(fieldTypeStr);
-                return new StructField(fieldName, fieldType);
-              })
+              .map(
+                  structFieldStr -> {
+                    List<String> structFieldStrArr = List.of(structFieldStr.split(" "));
+                    String fieldName = structFieldStrArr.get(0);
+                    String fieldTypeStr =
+                        String.join(" ", structFieldStrArr.subList(1, structFieldStrArr.size()));
+                    Type fieldType = parseBigQueryInformationSchemaType(fieldTypeStr);
+                    return new StructField(fieldName, fieldType);
+                  })
               .collect(Collectors.toList());
       return TypeFactory.createStructType(fields);
     } else {
