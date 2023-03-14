@@ -10,7 +10,6 @@ import static com.pso.bigquery.optimization.util.ZetaSQLHelperConstants.TABLE_3_
 import static com.pso.bigquery.optimization.util.ZetaSQLHelperConstants.TABLE_NAME;
 import static org.junit.Assert.assertEquals;
 
-import com.pso.bigquery.optimization.IdentifyCrossJoin;
 import com.pso.bigquery.optimization.IdentifySubqueryInWhere;
 import com.pso.bigquery.optimization.analysis.QueryAnalyzer;
 import java.util.List;
@@ -42,7 +41,8 @@ public class IdentifySubqueryInWhereTest {
   @Test
   public void IdentifySubqueryInWhereTest() {
     String expected =
-        "You are using an IN filter with a subquery without a DISTINCT on the following columns: project.dataset.table1.col2";
+        "You are using an IN filter with a subquery without a DISTINCT on the following columns:"
+            + " project.dataset.table1.col2";
     String query =
         "SELECT "
             + "   t1.col1 "
@@ -59,8 +59,10 @@ public class IdentifySubqueryInWhereTest {
   @Test
   public void IdentifySubqueryInWhere2CasesTest() {
     String expected =
-        "You are using an IN filter with a subquery without a DISTINCT on the following columns: project.dataset.table1.col1\n"
-            + "You are using an IN filter with a subquery without a DISTINCT on the following columns: project.dataset.table1.col2";
+        "You are using an IN filter with a subquery without a DISTINCT on the following columns:"
+            + " project.dataset.table1.col1\n"
+            + "You are using an IN filter with a subquery without a DISTINCT on the following"
+            + " columns: project.dataset.table1.col2";
     String query =
         "SELECT "
             + "   t1.col1 "
@@ -93,8 +95,9 @@ public class IdentifySubqueryInWhereTest {
 
   @Test
   public void IdentifySubqueryInWhereWithStruct() {
-    String expected = "You are using an IN filter with a subquery without a DISTINCT on the "
-        + "following columns: project.dataset.table1.col1, project.dataset.table1.col2";
+    String expected =
+        "You are using an IN filter with a subquery without a DISTINCT on the "
+            + "following columns: project.dataset.table1.col1, project.dataset.table1.col2";
     String query =
         "SELECT "
             + "   t1.col1 "

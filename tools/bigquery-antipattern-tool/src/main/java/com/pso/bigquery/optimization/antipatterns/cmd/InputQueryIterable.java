@@ -1,6 +1,5 @@
 package com.pso.bigquery.optimization.antipatterns.cmd;
 
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,4 +30,3 @@ public class InputQueryIterable implements Iterator<InputQuery> {
     }
   }
 }
-

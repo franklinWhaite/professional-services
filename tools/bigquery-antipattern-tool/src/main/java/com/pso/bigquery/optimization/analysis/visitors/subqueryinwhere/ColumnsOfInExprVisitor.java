@@ -30,12 +30,11 @@ public class ColumnsOfInExprVisitor extends BaseAnalyzerVisitor {
     super(projectId, catalog);
   }
 
-  public void visit(ResolvedColumnRef resolvedColumnRef){
+  public void visit(ResolvedColumnRef resolvedColumnRef) {
     columnList.add(resolvedColumnRef.getColumn().toString().split("#")[0]);
   }
 
   public String getResult() {
-    return columnList.stream().map(Object::toString)
-        .collect(Collectors.joining(", "));
+    return columnList.stream().map(Object::toString).collect(Collectors.joining(", "));
   }
 }

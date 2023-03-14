@@ -1,11 +1,10 @@
 package com.pso.bigquery.optimization.antipatterns.cmd;
 
-import org.apache.commons.cli.*;
-
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.cli.*;
 
 public class BQAntiPatternCMDParser {
 
@@ -16,25 +15,26 @@ public class BQAntiPatternCMDParser {
   public static Iterator<InputQuery> getInputQueries(String[] args) {
     Options options = new Options();
 
-    Option query = Option.builder(QUERY)
-        .argName(QUERY)
-        .hasArg()
-        .required(false)
-        .desc("set query").build();
+    Option query =
+        Option.builder(QUERY).argName(QUERY).hasArg().required(false).desc("set query").build();
     options.addOption(query);
 
-    Option filePath = Option.builder(FILE_PATH)
-        .argName(FILE_PATH)
-        .hasArg()
-        .required(false)
-        .desc("set file path").build();
+    Option filePath =
+        Option.builder(FILE_PATH)
+            .argName(FILE_PATH)
+            .hasArg()
+            .required(false)
+            .desc("set file path")
+            .build();
     options.addOption(filePath);
 
-    Option folderPath = Option.builder(FOLDER_PATH)
-        .argName(FOLDER_PATH)
-        .hasArg()
-        .required(false)
-        .desc("set file path").build();
+    Option folderPath =
+        Option.builder(FOLDER_PATH)
+            .argName(FOLDER_PATH)
+            .hasArg()
+            .required(false)
+            .desc("set file path")
+            .build();
     options.addOption(folderPath);
 
     CommandLine cmd;
@@ -68,10 +68,11 @@ public class BQAntiPatternCMDParser {
   }
 
   public static Iterator<InputQuery> buildIteratorFromFolderPath(String folderPath) {
-    List<String> fileList = Stream.of(new File(folderPath).listFiles())
-        .filter(file -> file.isFile())
-        .map(File::getAbsolutePath)
-        .collect(Collectors.toList());
+    List<String> fileList =
+        Stream.of(new File(folderPath).listFiles())
+            .filter(file -> file.isFile())
+            .map(File::getAbsolutePath)
+            .collect(Collectors.toList());
     return new InputQueryIterable(fileList);
   }
 }
