@@ -11,14 +11,14 @@
         <configuration>
           <container>
             <mainClass>
-                com.pso.bigquery.optimization.zetasql101.BuildCatalogBasedOnQueryAndAnalyzeJoins
+               com.pso.bigquery.optimization.Main
             </mainClass>
           </container>
           <from>
             <image>openjdk:11</image>
           </from>
           <to>
-            <image>query-pattern-analyzer</image>
+            <image>query-pattern-analyzer2</image>
           </to>
         </configuration>
         <groupId>com.google.cloud.tools</groupId>

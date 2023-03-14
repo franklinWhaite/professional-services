@@ -170,3 +170,26 @@ being `pso.bigquery.optimization`
       ├── BuildCatalogBasedOnQueryAndAnalyzeJoins.java        # Sample code that scans a query and builds catalog on the go by adding tables referenced in the query
       └── BuildCatalogForProjectAndAnalyzeJoins.java          # Sample code that scans a query and builds catalog by adding all the tables in a given project 
 ```
+
+## Runnning with docker
+``` bash
+mvn clean
+mvn install
+mvn compile jib:dockerBuild
+# inline query
+docker run -v "$HOME/.config/gcloud:/gcp/config:ro" \
+  -v /gcp/config/logs \
+  --env CLOUDSDK_CONFIG=/gcp/config \
+  --env GOOGLE_APPLICATION_CREDENTIALS=/gcp/config/application_default_credentials.json \
+  -i query-pattern-analyzer2 --query "select 1"
+
+
+# folder path
+export FOLDER_PATH=/path/with/queries/
+docker run -v "$HOME/.config/gcloud:/gcp/config:ro" \
+  -v /gcp/config/logs \
+  -v "$FOLDER_PATH:/queries" \
+  --env CLOUDSDK_CONFIG=/gcp/config \
+  --env GOOGLE_APPLICATION_CREDENTIALS=/gcp/config/application_default_credentials.json \
+  -i query-pattern-analyzer2 --folder_path "/queries"
+``` 
