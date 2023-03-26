@@ -62,6 +62,12 @@
       <artifactId>google-cloud-bigquery</artifactId>
       <groupId>com.google.cloud</groupId>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-storage -->
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-storage</artifactId>
+      <version>2.19.0</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/com.google.zetasql/zetasql-client -->
     <dependency>
       <artifactId>zetasql-client</artifactId>
@@ -90,11 +96,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <artifactId>libraries-bom</artifactId>
         <groupId>com.google.cloud</groupId>
-        <scope>import</scope>
+        <artifactId>libraries-bom</artifactId>
+        <version>26.10.0</version>
         <type>pom</type>
-        <version>25.2.0</version>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
