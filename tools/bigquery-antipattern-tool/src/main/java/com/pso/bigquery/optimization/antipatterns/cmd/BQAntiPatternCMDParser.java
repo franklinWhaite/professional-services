@@ -4,7 +4,12 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import org.apache.commons.cli.*;
+import com.google.api.gax.paging.Page;
 
 public class BQAntiPatternCMDParser {
 
@@ -68,11 +73,36 @@ public class BQAntiPatternCMDParser {
   }
 
   public static Iterator<InputQuery> buildIteratorFromFolderPath(String folderPath) {
+    if (folderPath.startsWith("gs://")){
+      Storage storage = StorageOptions.newBuilder().build().getService();
+      String trimFolderPathStr = folderPath.replace("gs://", "");
+      List<String> list = new ArrayList(Arrays.asList(trimFolderPathStr.split("/")));
+      String bucket = list.get(0);
+      list.remove(0);
+      String directoryPrefix = String.join("/", list) + "/";
+      Page<Blob> blobs =
+              storage.list(
+                      bucket,
+                      Storage.BlobListOption.prefix(directoryPrefix),
+                      Storage.BlobListOption.currentDirectory());
+      ArrayList gcsFileList = new ArrayList();
+      for (Blob blob : blobs.iterateAll()) {
+        String blobName = blob.getName();
+        if (blobName.equals(directoryPrefix)){
+          continue;
+        }
+        gcsFileList.add("gs://" + bucket + "/" + blobName);
+      }
+      return new InputQueryIterable(gcsFileList);
+    }
+    else{
     List<String> fileList =
         Stream.of(new File(folderPath).listFiles())
             .filter(file -> file.isFile())
             .map(File::getAbsolutePath)
             .collect(Collectors.toList());
+    System.out.println(fileList);
     return new InputQueryIterable(fileList);
+    }
   }
 }
