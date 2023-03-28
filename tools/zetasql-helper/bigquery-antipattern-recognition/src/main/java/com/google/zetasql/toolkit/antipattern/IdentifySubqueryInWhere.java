@@ -22,6 +22,7 @@ public class IdentifySubqueryInWhere implements BasePatternDetector {
     SubqueryInWhereVisitor visitor = new SubqueryInWhereVisitor();
 
     Iterator<ResolvedStatement> statementIterator = analyzer.analyzeStatements(query, catalog);
+
     statementIterator.forEachRemaining(statement -> statement.accept(visitor));
 
     visitor.getResult().forEach(subqueryInWhereColumns -> parseResults(subqueryInWhereColumns));
