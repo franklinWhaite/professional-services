@@ -101,7 +101,6 @@ public class BQAntiPatternCMDParser {
             .filter(file -> file.isFile())
             .map(File::getAbsolutePath)
             .collect(Collectors.toList());
-    System.out.println(fileList);
     return new InputQueryIterable(fileList);
     }
   }
