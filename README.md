@@ -3,6 +3,16 @@
 Common solutions and tools developed by Google Cloud's Professional Services
 team.
 
+## Disclaimer
+
+This repository and its contents are not an officially supported Google product.
+
+## License
+
+All solutions within this repository are provided under the
+[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. Please see
+the [LICENSE](/LICENSE) file for more detailed terms and conditions.
+
 [![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2FGoogleCloudPlatform%2Fprofessional-services.git)
 
 ## Examples
@@ -51,6 +61,10 @@ them to fit your particular use case.
     such as adding partitioning, clustering, metadata columns and prefixes to table names.
 *   [BigQuery Pipeline Utility](tools/bqpipeline) - Python utility class for
     defining data pipelines in BigQuery.
+*   [BigQuery Remote Function](examples/bq-remote-function) - It allows user to implement custom
+    services or libraries in languages other than SQL or Javascript which are not part of UDFs.
+    The utility contains sample string format Java code to deploy cloud run gen2 instance and invoke 
+    the service from BigQuery using remote function.
 *   [BigQuery Snowflake Table Migration Tool](examples/bigquery-snowflake-tables-migration-utility) - 
     BigQuery Snowflake Table Migration Tool helps to migrate the table DDL's from Snowflake to BigQuery.
     The utility leverages BigQuery Translation API and offers additional features
@@ -152,6 +166,8 @@ them to fit your particular use case.
 *   [Dataflow Streaming Schema Changes Handler](examples/dataflow-streaming-schema-handler) -
     Dataflow example to handle schema changes using schema enforcement and DLT
     approach
+*   [Dataflow Streaming XML to GCS](examples/dataflow-xml-pubsub-to-gcs) -
+    Dataflow example to handle streaming of xml encoded messages and write them to Google Cloud Storage
 *   [Dataflow DLP Hashpipeline](examples/dataflow-dlp-hash-pipeline) - Match DLP
     Social Security Number findings against a hashed dictionary in Firestore.
     Use Secret Manager for the hash key.
@@ -170,6 +186,8 @@ them to fit your particular use case.
 *   [Dataproc Persistent History Server for Ephemeral Clusters](examples/dataproc-persistent-history-server) -
     Example of writing logs from an ephemeral cluster to GCS and using a
     separate single node cluster to look at Spark and YARN History UIs.
+*   [Dataproc Lifecycle Management via Composer](examples/dataproc-lifecycle-via-composer) - Ephemeral Dataproc lifecycle management and resources optimization via Composer, Terraform template to deploy Composer and additional reqs, Dynamically generated DAGs from jobs config files.
+*   [Dataproc Running Notebooks](examples/dataproc-running-notebooks) - Orchestrating the workflow of running Jupyter Notebooks on a Dataproc cluser via PySpark job
 *   [dbt-on-cloud-composer](examples/dbt-on-cloud-composer) - Example of using
     dbt to manage BigQuery data pipelines, utilizing Cloud Composer to run and
     schedule the dbt runs.
@@ -198,6 +216,8 @@ them to fit your particular use case.
 *   [GCS to BQ using serverless services](examples/gcs-to-bq-serverless-services) -
     Example to ingest GCS to BigQuery using serverless services such as Cloud
     Function, Pub/Sub and Serverless Spark.
+*   [GDCE Terraform Example](examples/gdce-terraform-example) - Example for provisioning GDCE
+    resources using terraform.
 *   [GKE HA setup using spot VMs](examples/gke-ha-setup-using-spot-vms/) -
     Example for running an application with high availability requirements on
     GKE spot nodes using on-demand nodes as fallback
@@ -516,16 +536,6 @@ Platform usage.
 
 See the contributing [instructions](/CONTRIBUTING.md) to get started
 contributing.
-
-## License
-
-All solutions within this repository are provided under the
-[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. Please see
-the [LICENSE](/LICENSE) file for more detailed terms and conditions.
-
-## Disclaimer
-
-This repository and its contents are not an official Google Product.
 
 ## Contact
 
