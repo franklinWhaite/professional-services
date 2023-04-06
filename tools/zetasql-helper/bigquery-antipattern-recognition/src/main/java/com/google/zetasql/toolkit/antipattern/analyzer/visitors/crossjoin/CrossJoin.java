@@ -1,4 +1,4 @@
-package com.google.zetasql.toolkit.antipattern.visitors.crossjoin;
+package com.google.zetasql.toolkit.antipattern.analyzer.visitors.crossjoin;
 
 import java.util.ArrayList;
 import java.util.List;

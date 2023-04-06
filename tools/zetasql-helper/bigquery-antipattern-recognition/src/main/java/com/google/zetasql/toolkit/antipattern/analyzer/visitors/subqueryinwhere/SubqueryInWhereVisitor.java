@@ -1,4 +1,4 @@
-package com.google.zetasql.toolkit.antipattern.visitors.subqueryinwhere;
+package com.google.zetasql.toolkit.antipattern.analyzer.visitors.subqueryinwhere;
 
 import com.google.zetasql.resolvedast.ResolvedNodes;
 import com.google.zetasql.resolvedast.ResolvedNodes.ResolvedAggregateScanBase;

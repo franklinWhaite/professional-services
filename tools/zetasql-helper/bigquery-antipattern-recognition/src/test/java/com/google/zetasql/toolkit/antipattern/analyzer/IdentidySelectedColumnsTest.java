@@ -1,4 +1,4 @@
-package com.google.zetasql.toolkit.antipattern;
+package com.google.zetasql.toolkit.antipattern.analyzer;
 
 import static com.google.zetasql.toolkit.antipattern.util.ZetaSQLHelperConstants.*;
 import static org.junit.Assert.*;
@@ -11,6 +11,7 @@ import com.google.zetasql.SimpleTable;
 import com.google.zetasql.TypeFactory;
 import com.google.zetasql.ZetaSQLType;
 import com.google.zetasql.toolkit.ZetaSQLToolkitAnalyzer;
+import com.google.zetasql.toolkit.antipattern.analyzer.IdentidySelectedColumns;
 import com.google.zetasql.toolkit.catalog.bigquery.BigQueryCatalog;
 import com.google.zetasql.toolkit.options.BigQueryLanguageOptions;
 import java.util.List;

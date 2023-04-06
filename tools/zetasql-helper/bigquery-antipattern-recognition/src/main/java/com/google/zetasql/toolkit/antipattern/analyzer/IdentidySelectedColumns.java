@@ -1,12 +1,12 @@
-package com.google.zetasql.toolkit.antipattern;
+package com.google.zetasql.toolkit.antipattern.analyzer;
 
 import com.google.zetasql.NotFoundException;
 import com.google.zetasql.Table;
 import com.google.zetasql.resolvedast.ResolvedNodes.ResolvedStatement;
 import com.google.zetasql.toolkit.ZetaSQLToolkitAnalyzer;
 import com.google.zetasql.toolkit.antipattern.exceptions.TableNotFoundInCatalog;
-import com.google.zetasql.toolkit.antipattern.visitors.SelectedColumnsVisitor;
-import com.google.zetasql.toolkit.antipattern.visitors.SelectedColumnsVisitor.TableWithSelectedCol;
+import com.google.zetasql.toolkit.antipattern.analyzer.visitors.SelectedColumnsVisitor;
+import com.google.zetasql.toolkit.antipattern.analyzer.visitors.SelectedColumnsVisitor.TableWithSelectedCol;
 import com.google.zetasql.toolkit.catalog.bigquery.BigQueryCatalog;
 import java.util.ArrayList;
 import java.util.Arrays;

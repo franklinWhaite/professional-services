@@ -1,4 +1,4 @@
-package com.google.zetasql.toolkit.antipattern.visitors.crossjoin;
+package com.google.zetasql.toolkit.antipattern.analyzer.visitors.crossjoin;
 
 import com.google.zetasql.resolvedast.ResolvedNodes.*;
 import java.util.ArrayList;

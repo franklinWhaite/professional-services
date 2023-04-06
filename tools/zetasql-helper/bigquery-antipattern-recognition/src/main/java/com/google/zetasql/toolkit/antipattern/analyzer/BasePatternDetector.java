@@ -1,4 +1,4 @@
-package com.google.zetasql.toolkit.antipattern;
+package com.google.zetasql.toolkit.antipattern.analyzer;
 
 import com.google.zetasql.toolkit.ZetaSQLToolkitAnalyzer;
 import com.google.zetasql.toolkit.catalog.bigquery.BigQueryCatalog;

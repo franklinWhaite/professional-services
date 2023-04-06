@@ -1,4 +1,4 @@
-package com.google.zetasql.toolkit.antipattern.visitors;
+package com.google.zetasql.toolkit.antipattern.analyzer.visitors;
 
 import com.google.zetasql.resolvedast.ResolvedNodes;
 import com.google.zetasql.resolvedast.ResolvedNodes.*;

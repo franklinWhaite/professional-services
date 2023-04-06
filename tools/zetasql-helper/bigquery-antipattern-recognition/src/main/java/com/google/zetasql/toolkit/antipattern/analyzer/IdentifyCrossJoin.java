@@ -1,9 +1,9 @@
-package com.google.zetasql.toolkit.antipattern;
+package com.google.zetasql.toolkit.antipattern.analyzer;
 
 import com.google.zetasql.resolvedast.ResolvedNodes.ResolvedStatement;
 import com.google.zetasql.toolkit.ZetaSQLToolkitAnalyzer;
-import com.google.zetasql.toolkit.antipattern.visitors.crossjoin.CrossJoin;
-import com.google.zetasql.toolkit.antipattern.visitors.crossjoin.CrossJoinVisitor;
+import com.google.zetasql.toolkit.antipattern.analyzer.visitors.crossjoin.CrossJoin;
+import com.google.zetasql.toolkit.antipattern.analyzer.visitors.crossjoin.CrossJoinVisitor;
 import com.google.zetasql.toolkit.catalog.bigquery.BigQueryCatalog;
 import java.util.ArrayList;
 import java.util.Iterator;

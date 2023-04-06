@@ -1,30 +1,18 @@
 package com.google.zetasql.toolkit.antipattern;
 
-import static com.google.zetasql.toolkit.antipattern.util.ZetaSQLHelperConstants.COL_1;
-import static com.google.zetasql.toolkit.antipattern.util.ZetaSQLHelperConstants.COL_2;
-import static com.google.zetasql.toolkit.antipattern.util.ZetaSQLHelperConstants.TABLE_1_NAME;
-import static com.google.zetasql.toolkit.antipattern.util.ZetaSQLHelperConstants.TABLE_2_NAME;
-import static com.google.zetasql.toolkit.antipattern.util.ZetaSQLHelperConstants.TABLE_3_NAME;
-import static com.google.zetasql.toolkit.antipattern.util.ZetaSQLHelperConstants.TABLE_NAME;
-
 import com.google.api.client.util.DateTime;
-import com.google.cloud.bigquery.InsertAllRequest;
-import com.google.cloud.bigquery.TableId;
 import com.google.zetasql.AnalyzerOptions;
 import com.google.zetasql.LanguageOptions;
-import com.google.zetasql.SimpleCatalog;
-import com.google.zetasql.SimpleColumn;
-import com.google.zetasql.SimpleTable;
-import com.google.zetasql.TypeFactory;
-import com.google.zetasql.ZetaSQLType;
+import com.google.zetasql.toolkit.antipattern.analyzer.BasePatternDetector;
+import com.google.zetasql.toolkit.antipattern.analyzer.IdentidySelectedColumns;
+import com.google.zetasql.toolkit.antipattern.analyzer.IdentifyCrossJoin;
+import com.google.zetasql.toolkit.antipattern.analyzer.IdentifySubqueryInWhere;
 import com.google.zetasql.toolkit.antipattern.cmd.BQAntiPatternCMDParser;
 import com.google.zetasql.toolkit.antipattern.cmd.InputQuery;
 import com.google.zetasql.toolkit.antipattern.util.BigQueryHelper;
 import com.google.zetasql.toolkit.ZetaSQLToolkitAnalyzer;
 import com.google.zetasql.toolkit.catalog.bigquery.BigQueryCatalog;
 import com.google.zetasql.toolkit.options.BigQueryLanguageOptions;
-import com.google.cloud.bigquery.FieldValueList;
-import com.google.cloud.bigquery.TableResult;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;

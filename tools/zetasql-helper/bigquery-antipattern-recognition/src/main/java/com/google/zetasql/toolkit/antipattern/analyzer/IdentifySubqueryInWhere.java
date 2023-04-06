@@ -1,8 +1,8 @@
-package com.google.zetasql.toolkit.antipattern;
+package com.google.zetasql.toolkit.antipattern.analyzer;
 
 import com.google.zetasql.resolvedast.ResolvedNodes.ResolvedStatement;
 import com.google.zetasql.toolkit.ZetaSQLToolkitAnalyzer;
-import com.google.zetasql.toolkit.antipattern.visitors.subqueryinwhere.SubqueryInWhereVisitor;
+import com.google.zetasql.toolkit.antipattern.analyzer.visitors.subqueryinwhere.SubqueryInWhereVisitor;
 import com.google.zetasql.toolkit.catalog.bigquery.BigQueryCatalog;
 import java.util.ArrayList;
 import java.util.Iterator;
