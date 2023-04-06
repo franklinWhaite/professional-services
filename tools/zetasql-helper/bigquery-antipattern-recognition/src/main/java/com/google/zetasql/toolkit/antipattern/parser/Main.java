@@ -14,7 +14,8 @@ public class Main {
         + "FROM "
         + " `project.dataset.table1` t1 "
         + "WHERE "
-        + " t1.col2 IN (select distinct t2.col2 from `project.dataset.table2` t2)"
+        //+ " t1.col2 IN (select distinct t2.col2 from `project.dataset.table2` t2)"
+        + " t1.col2 IN (select t2.col2 from `project.dataset.table2` t2)"
        // + " t1.col2 IN (select t2.col2 from `project.dataset.table2` t2 group by t2.col2)"
        // + " t1.col2 IN (1,2,3)"
         + " AND t1.col3>0";
