@@ -10,6 +10,7 @@ import java.util.Stack;
 public class IdentifyCrossJoinVisitor extends ParseTreeVisitor {
 
   private final static String JOIN_TYPE_CROSS = "CROSS";
+  private final static String CROSS_JOIN_MESSAGE = "CROSS JOIN instead of INNER JOIN between %s and %s";
 
   private Stack<ASTWhereClause> filterStack = new Stack<ASTWhereClause>();
 
@@ -21,23 +22,32 @@ public class IdentifyCrossJoinVisitor extends ParseTreeVisitor {
 
 
   @Override
-  public void visit(ASTNodes.ASTFromClause node) {
-    if(node.getTableExpression() instanceof ASTJoin) {
-      ASTJoin joinNode = (ASTJoin) node.getTableExpression();
-      if(joinNode.getJoinType().toString().equals(JOIN_TYPE_CROSS)) {
-        System.out.println("Found CROSS JOIN");
-        CrossJoinSide lhs = new CrossJoinSide(joinNode.getLhs());
-        CrossJoinSide rhs = new CrossJoinSide(joinNode.getRhs());
+  public void visit(ASTNodes.ASTJoin joinNode) {
+    if(joinNode.getJoinType().toString().equals(JOIN_TYPE_CROSS) || (joinNode.getJoinType().toString().equals("DEFAULT_JOIN_TYPE") && joinNode.getOnClause()==null)) {
+      CrossJoinSide lhs = new CrossJoinSide(joinNode.getLhs());
+      CrossJoinSide rhs = new CrossJoinSide(joinNode.getRhs());
+      CrossJoin crossJoin = new CrossJoin(lhs, rhs);
+      CrossJoinFilterChecker crossJoinFilterChecker = new CrossJoinFilterChecker();
+      crossJoinFilterChecker.setCrossJoin(crossJoin);
+      filterStack.peek().accept(crossJoinFilterChecker);
+      if(crossJoinFilterChecker.result()) {
+        result.add(String.format(CROSS_JOIN_MESSAGE,crossJoin.getNamesTablesUsedOnFilter().toArray(new String[0])));
       }
     }
-    super.visit(node);
+    super.visit(joinNode);
   }
 
   @Override
-  public void visit(ASTNodes.ASTWhereClause node) {
-    filterStack.add(node);
-    super.visit(node);
-    filterStack.pop();
+  public void visit(ASTNodes.ASTSelect node) {
+    ASTWhereClause whereNode = node.getWhereClause();
+    if(!(whereNode==null)) {
+      filterStack.add(whereNode);
+      super.visit(node);
+      filterStack.pop();
+    } else {
+      super.visit(node);
+    }
   }
+
 
 }

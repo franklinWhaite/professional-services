@@ -61,6 +61,6 @@ public class FindFilterForCrossJoinVisitor extends ResolvedNodes.Visitor {
   }
 
   public boolean result() {
-    return foundFilterWithLeftTable;
+    return foundFilterForCrossJoin;
   }
 }

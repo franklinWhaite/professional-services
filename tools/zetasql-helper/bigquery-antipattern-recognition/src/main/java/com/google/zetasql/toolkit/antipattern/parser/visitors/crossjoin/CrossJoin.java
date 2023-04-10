@@ -7,15 +7,16 @@ public class CrossJoin {
 
   private CrossJoinSide left;
   private CrossJoinSide right;
-  private List<String> tableNames = new ArrayList<>();
+  private List<String> namesTablesUsedOnFilter = new ArrayList<>();
+
 
   CrossJoin(CrossJoinSide left, CrossJoinSide right) {
     this.left = left;
     this.right = right;
   }
 
-  public List<String> getTableNames() {
-    return tableNames;
+  public List<String> getNamesTablesUsedOnFilter() {
+    return namesTablesUsedOnFilter;
   }
 
   public CrossJoinSide getLeft() {
@@ -24,5 +25,9 @@ public class CrossJoin {
 
   public CrossJoinSide getRight() {
     return right;
+  }
+
+  public void addTableName(String tableName) {
+    namesTablesUsedOnFilter.add(tableName);
   }
 }
