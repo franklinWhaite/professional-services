@@ -10,7 +10,7 @@ import java.util.Stack;
 public class IdentifyCrossJoinVisitor extends ParseTreeVisitor {
 
   private final static String JOIN_TYPE_CROSS = "CROSS";
-  private final static String CROSS_JOIN_MESSAGE = "CROSS JOIN instead of INNER JOIN between %s and %s";
+  private final static String CROSS_JOIN_MESSAGE = "CROSS JOIN instead of INNER JOIN between %s and %s.";
 
   private Stack<ASTWhereClause> filterStack = new Stack<ASTWhereClause>();
 

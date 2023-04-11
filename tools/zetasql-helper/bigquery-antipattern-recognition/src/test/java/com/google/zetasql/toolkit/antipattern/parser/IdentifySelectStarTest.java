@@ -20,11 +20,12 @@ public class IdentifySelectStarTest {
 
   @Test
   public void selectStarSingleTableTest() {
+    String expected = "SELECT * on table: project.dataset.table1. Check that all columns are needed.";
     String query = "SELECT * FROM `project.dataset.table1`";
     ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
     String recommendations = (new IdentifySelectStar()).run(parsedQuery);
     assertEquals(
-        "SELECT * on table: project.dataset.table1. Check that all columns are needed.",
+        expected,
         recommendations);
   }
 
