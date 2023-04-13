@@ -17,7 +17,7 @@ public class CrossJoinSide {
 
   private void setup(ASTNode astNode) {
     if(astNode instanceof ASTTablePathExpression) {
-      tableNameList.add(((ASTTablePathExpression) astNode).getAlias().getIdentifier().getIdString());
+      tableNameList.add(CrossJoinUtil.getNameFromTablePathExpression((ASTTablePathExpression) astNode));
     } if(astNode instanceof ASTJoin) {
       ASTJoin joinNode = ((ASTJoin) astNode);
       TablesInJoinVisitor tablesInJoinVisitor = new TablesInJoinVisitor();

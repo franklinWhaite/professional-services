@@ -23,11 +23,12 @@ public class TablesInJoinVisitor extends ParseTreeVisitor {
   }
 
   private void checkSide(ASTNode node) {
-    if(node instanceof ASTTablePathExpression) {
-      tableNameList.add(((ASTTablePathExpression) node).getAlias().getIdentifier().getIdString());
+    if (node instanceof ASTTablePathExpression) {
+      tableNameList.add(
+          CrossJoinUtil.getNameFromTablePathExpression((ASTTablePathExpression) node));
+
     } else if (node instanceof ASTJoin) {
       super.visit((ASTJoin) node);
     }
   }
-
 }
