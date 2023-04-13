@@ -14,8 +14,9 @@ import com.google.api.gax.paging.Page;
 public class BQAntiPatternCMDParser {
 
   public static final String QUERY_OPTION_NAME = "query";
-  public static final String FILE_PATH_OPTION_NAME = "file_path";
-  public static final String FOLDER_PATH_OPTION_NAME = "folder_path";
+  public static final String FILE_PATH_OPTION_NAME = "input_file_path";
+  public static final String OUTPUT_FILE_OPTION_NAME = "output_file_path";
+  public static final String FOLDER_PATH_OPTION_NAME = "input_folder_path";
   public static final String READ_FROM_INFO_SCHEMA_FLAG_NAME = "read_from_info_schema";
   public static final String PROCESSING_PROJECT_ID_OPTION_NAME = "processing_project_id";
   public static final String OUTPUT_PROJECT_ID_OPTION_NAME = "output_project_id";
@@ -32,6 +33,14 @@ public class BQAntiPatternCMDParser {
 
   public String getOutputTableProjectId() {
     return cmd.getOptionValue(OUTPUT_PROJECT_ID_OPTION_NAME);
+  }
+
+  public String getOutputFileOptionName() {
+    return cmd.getOptionValue(OUTPUT_FILE_OPTION_NAME);
+  }
+
+  public boolean hasOutputFileOptionName() {
+    return cmd.hasOption(OUTPUT_FILE_OPTION_NAME);
   }
 
   public Options getOptions() {
@@ -83,6 +92,15 @@ public class BQAntiPatternCMDParser {
             .desc("project with the table to which output will be written")
             .build();
     options.addOption(outputProjectOption);
+
+    Option outputFileOption =
+        Option.builder(OUTPUT_FILE_OPTION_NAME)
+            .argName(OUTPUT_FILE_OPTION_NAME)
+            .hasArg()
+            .required(false)
+            .desc("path to csv file for result output")
+            .build();
+    options.addOption(outputFileOption);
 
     return options;
   }

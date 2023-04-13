@@ -65,7 +65,7 @@
                 <configuration>
                     <container>
                         <mainClass>
-                            com.google.zetasql.toolkit.antipattern.Main
+                            com.google.zetasql.toolkit.antipattern.analyzer.Main
                         </mainClass>
                     </container>
                     <from>

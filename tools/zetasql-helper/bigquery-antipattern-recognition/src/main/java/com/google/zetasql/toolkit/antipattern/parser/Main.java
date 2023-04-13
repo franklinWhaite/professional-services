@@ -1,42 +1,58 @@
 package com.google.zetasql.toolkit.antipattern.parser;
 
+import static com.google.zetasql.toolkit.antipattern.cmd.BQAntiPatternCMDParser.OUTPUT_FILE_OPTION_NAME;
+
 import com.google.zetasql.LanguageOptions;
 import com.google.zetasql.Parser;
 import com.google.zetasql.parser.ASTNodes.ASTStatement;
+import com.google.zetasql.toolkit.antipattern.cmd.BQAntiPatternCMDParser;
+import com.google.zetasql.toolkit.antipattern.cmd.InputQuery;
+import com.google.zetasql.toolkit.antipattern.cmd.OutputGenerator;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.cli.ParseException;
 
 public class Main {
 
-  public static void main(String[] args) {
-    // String query = "SELECT t1.col1 from `project.dataset.table1` t1 WHERE t1.col2 IN (select
-    // t2.col2 from `project.dataset.table2`)";
-    // String query = "SELECT t1.col1 from `project.dataset.table1` t1 WHERE t1.col2 >0";
-    String query =
-        "SELECT "
-            + " t1.* "
-            + "FROM "
-            + " `project.dataset.table1` t1 "
-            // + "INNER JOIN "
-            // + " `project.dataset.table3` t3 ON t1.col1 = t3.col3"
-            + "CROSS JOIN "
-            + "  (SELECT * FROM `project.dataset.table2`) t2 "
-            + "WHERE "
-            + "   t1.col3 > 0"
-            + "   AND t1.col1 = t2.col1 "
-            + "   AND t1.col2 > t2.col2 "
-            + "   AND t1.col4 in (SELECT distinct col4 from table4) ";
+  public static void main(String[] args) throws ParseException, IOException {
 
     // query = "SELECT * FROM `project.dataset.table1`";
     LanguageOptions languageOptions = new LanguageOptions();
     languageOptions.enableMaximumLanguageFeatures();
     languageOptions.setSupportsAllStatementKinds();
 
-    ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
+    BQAntiPatternCMDParser cmdParser = new BQAntiPatternCMDParser(args);
+    Iterator<InputQuery> inputQueriesIterator = cmdParser.getInputQueries();
 
-    System.out.println(parsedQuery);
-    // System.out.println(new IdentifySelectStar().run(parsedQuery));
-    // System.out.println(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
-    // System.out.println(new IdentifyCrossJoin().run(parsedQuery));
+    InputQuery inputQuery;
+    List<String[]> outputData = new ArrayList<>();
+    while (inputQueriesIterator.hasNext()) {
+      inputQuery = inputQueriesIterator.next();
+      String query = inputQuery.getQuery();
 
+      try {
+        ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
+        String rec = getRecommendations(parsedQuery);
+        if(rec.length()>0){
+          outputData.add(new String[]{inputQuery.getPath(), "\""+rec+"\""});
+        }
+      } catch (Exception e) {
+        outputData.add(new String[]{inputQuery.getPath(), "error"});
+      }
+    }
+    OutputGenerator.writeOutput(cmdParser, outputData);
+  }
+
+  private static String getRecommendations(ASTStatement parsedQuery) {
+    ArrayList<String> recommendation = new ArrayList<>();
+    recommendation.add(new IdentifySelectStar().run(parsedQuery));
+    recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
+    recommendation.add(new IdentifyCrossJoin().run(parsedQuery));
+    return recommendation.stream().filter(x-> x.length()>0).collect(Collectors.joining("\n"));
   }
 }
 

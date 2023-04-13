@@ -2,7 +2,7 @@ package com.google.zetasql.toolkit.antipattern.parser;
 
 import com.google.zetasql.parser.ASTNodes.ASTStatement;
 import com.google.zetasql.toolkit.antipattern.parser.visitors.InSubqueryWithoutAggVisitor;
-import org.apache.commons.lang3.StringUtils;
+import java.util.stream.Collectors;
 
 public class IdentifyInSubqueryWithoutAgg implements BasePatternDetector{
 
@@ -11,6 +11,6 @@ public class IdentifyInSubqueryWithoutAgg implements BasePatternDetector{
     InSubqueryWithoutAggVisitor visitor = new InSubqueryWithoutAggVisitor();
     parsedQuery.accept(visitor);
 
-    return StringUtils.join(visitor.getResult(), "\n");
+    return visitor.getResult().stream().distinct().collect(Collectors.joining("\n"));
   }
 }

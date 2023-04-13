@@ -1,4 +1,4 @@
-package com.google.zetasql.toolkit.antipattern;
+package com.google.zetasql.toolkit.antipattern.analyzer;
 
 import com.google.api.client.util.DateTime;
 import com.google.zetasql.AnalyzerOptions;

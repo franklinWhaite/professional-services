@@ -2,7 +2,8 @@ package com.google.zetasql.toolkit.antipattern.parser;
 
 import com.google.zetasql.parser.ASTNodes.ASTStatement;
 import com.google.zetasql.toolkit.antipattern.parser.visitors.IdentifySelectStarVisitor;
-import org.apache.commons.lang3.StringUtils;
+import java.util.stream.Collectors;
+
 
 public class IdentifySelectStar {
 
@@ -10,6 +11,6 @@ public class IdentifySelectStar {
     IdentifySelectStarVisitor visitor = new IdentifySelectStarVisitor();
     parsedQuery.accept(visitor);
 
-    return StringUtils.join(visitor.getResult(), "\n");
+    return visitor.getResult().stream().distinct().collect(Collectors.joining("\n"));
   }
 }
