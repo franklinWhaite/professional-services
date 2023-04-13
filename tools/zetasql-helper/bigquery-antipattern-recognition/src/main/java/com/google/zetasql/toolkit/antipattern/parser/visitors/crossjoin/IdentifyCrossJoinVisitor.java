@@ -29,9 +29,11 @@ public class IdentifyCrossJoinVisitor extends ParseTreeVisitor {
       CrossJoin crossJoin = new CrossJoin(lhs, rhs);
       CrossJoinFilterChecker crossJoinFilterChecker = new CrossJoinFilterChecker();
       crossJoinFilterChecker.setCrossJoin(crossJoin);
-      filterStack.peek().accept(crossJoinFilterChecker);
-      if(crossJoinFilterChecker.result()) {
-        result.add(String.format(CROSS_JOIN_MESSAGE,crossJoin.getNamesTablesUsedOnFilter().toArray(new String[0])));
+      if(!filterStack.empty()) {
+        filterStack.peek().accept(crossJoinFilterChecker);
+        if(crossJoinFilterChecker.result()) {
+          result.add(String.format(CROSS_JOIN_MESSAGE,crossJoin.getNamesTablesUsedOnFilter().toArray(new String[0])));
+        }
       }
     }
     super.visit(joinNode);

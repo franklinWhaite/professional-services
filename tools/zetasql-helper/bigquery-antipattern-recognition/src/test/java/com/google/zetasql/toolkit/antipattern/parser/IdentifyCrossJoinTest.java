@@ -38,7 +38,7 @@ public class IdentifyCrossJoinTest {
   @Test
   public void crossJoinTwoCrossJoinsTest() {
     String expected =
-        "CROSS JOIN instead of INNER JOIN between t1 and t3."
+        "CROSS JOIN instead of INNER JOIN between t1 and t3.\n"
             + "CROSS JOIN instead of INNER JOIN between t1 and t2.";
     String query =
         "SELECT "
@@ -77,8 +77,7 @@ public class IdentifyCrossJoinTest {
   @Test
   public void crossJoinTableSubqueryTest() {
     String expected =
-        "CROSS JOIN instead of INNER JOIN between t1 and t2. Try to change for a INNER JOIN"
-            + " if possible.";
+        "CROSS JOIN instead of INNER JOIN between t1 and t2.";
     String query =
         "SELECT "
             + "   t1.col1 "
@@ -96,7 +95,7 @@ public class IdentifyCrossJoinTest {
   @Test
   public void crossJoinTwoSubqueries() {
     String expected =
-        "CROSS JOIN instead of INNER JOIN between t1 and t2. Try to change for a INNER JOIN if possible.";
+        "CROSS JOIN instead of INNER JOIN between t1 and t2.";
     String query =
         "SELECT "
             + "   t1.col1 "
@@ -134,8 +133,7 @@ public class IdentifyCrossJoinTest {
   @Test
   public void crossJoinSeveralJoinsAndSubquery() {
     String expected =
-        "CROSS JOIN instead of INNER JOIN between t1 and t3. Try to change for a INNER JOIN"
-            + " if possible.";
+        "CROSS JOIN instead of INNER JOIN between t1 and t3.";
     String query =
         "SELECT "
             + "   t1.col1 "

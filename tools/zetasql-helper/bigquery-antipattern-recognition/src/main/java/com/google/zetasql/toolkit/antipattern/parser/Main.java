@@ -23,9 +23,9 @@ public class Main {
             + "   t1.col3 > 0"
             + "   AND t1.col1 = t2.col1 "
             + "   AND t1.col2 > t2.col2 "
-            + "   AND t1.col4 in (SELECT col4 from table4) ";
+            + "   AND t1.col4 in (SELECT distinct col4 from table4) ";
 
-    query = "SELECT * FROM `project.dataset.table1`";
+    // query = "SELECT * FROM `project.dataset.table1`";
     LanguageOptions languageOptions = new LanguageOptions();
     languageOptions.enableMaximumLanguageFeatures();
     languageOptions.setSupportsAllStatementKinds();
@@ -33,9 +33,9 @@ public class Main {
     ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
 
     System.out.println(parsedQuery);
-    System.out.println(new IdentifySelectStar().run(parsedQuery));
-    System.out.println(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
-    System.out.println(new IdentifyCrossJoin().run(parsedQuery));
+    // System.out.println(new IdentifySelectStar().run(parsedQuery));
+    // System.out.println(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
+    // System.out.println(new IdentifyCrossJoin().run(parsedQuery));
 
   }
 }
