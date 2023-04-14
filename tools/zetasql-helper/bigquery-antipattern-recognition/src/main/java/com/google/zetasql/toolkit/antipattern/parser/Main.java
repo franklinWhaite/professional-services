@@ -1,14 +1,11 @@
 package com.google.zetasql.toolkit.antipattern.parser;
 
-import static com.google.zetasql.toolkit.antipattern.cmd.BQAntiPatternCMDParser.OUTPUT_FILE_OPTION_NAME;
-
 import com.google.zetasql.LanguageOptions;
 import com.google.zetasql.Parser;
 import com.google.zetasql.parser.ASTNodes.ASTStatement;
 import com.google.zetasql.toolkit.antipattern.cmd.BQAntiPatternCMDParser;
 import com.google.zetasql.toolkit.antipattern.cmd.InputQuery;
 import com.google.zetasql.toolkit.antipattern.cmd.OutputGenerator;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,7 +17,6 @@ public class Main {
 
   public static void main(String[] args) throws ParseException, IOException {
 
-    // query = "SELECT * FROM `project.dataset.table1`";
     LanguageOptions languageOptions = new LanguageOptions();
     languageOptions.enableMaximumLanguageFeatures();
     languageOptions.setSupportsAllStatementKinds();
@@ -38,10 +34,10 @@ public class Main {
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
         String rec = getRecommendations(parsedQuery);
         if(rec.length()>0){
-          outputData.add(new String[]{inputQuery.getPath(), "\""+rec+"\""});
+          outputData.add(new String[]{inputQuery.getQueryId(), "\""+rec+"\""});
         }
       } catch (Exception e) {
-        outputData.add(new String[]{inputQuery.getPath(), "error"});
+        outputData.add(new String[]{inputQuery.getQueryId(), "error"});
       }
     }
     OutputGenerator.writeOutput(cmdParser, outputData);

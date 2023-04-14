@@ -1,6 +1,7 @@
 package com.google.zetasql.toolkit.antipattern.cmd;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,8 +16,9 @@ public class BQAntiPatternCMDParser {
 
   public static final String QUERY_OPTION_NAME = "query";
   public static final String FILE_PATH_OPTION_NAME = "input_file_path";
-  public static final String OUTPUT_FILE_OPTION_NAME = "output_file_path";
   public static final String FOLDER_PATH_OPTION_NAME = "input_folder_path";
+  public static final String INPUT_CSV_FILE_OPTION_NAME = "input_csv_file_path";
+  public static final String OUTPUT_FILE_OPTION_NAME = "output_file_path";
   public static final String READ_FROM_INFO_SCHEMA_FLAG_NAME = "read_from_info_schema";
   public static final String PROCESSING_PROJECT_ID_OPTION_NAME = "processing_project_id";
   public static final String OUTPUT_PROJECT_ID_OPTION_NAME = "output_project_id";
@@ -28,7 +30,6 @@ public class BQAntiPatternCMDParser {
     options = getOptions();
     CommandLineParser parser = new BasicParser();
     cmd = parser.parse(options, args);
-
   }
 
   public String getOutputTableProjectId() {
@@ -46,7 +47,12 @@ public class BQAntiPatternCMDParser {
   public Options getOptions() {
     Options options = new Options();
     Option query =
-        Option.builder(QUERY_OPTION_NAME).argName(QUERY_OPTION_NAME).hasArg().required(false).desc("set query").build();
+        Option.builder(QUERY_OPTION_NAME)
+            .argName(QUERY_OPTION_NAME)
+            .hasArg()
+            .required(false)
+            .desc("set query")
+            .build();
     options.addOption(query);
 
     Option filePath =
@@ -102,22 +108,33 @@ public class BQAntiPatternCMDParser {
             .build();
     options.addOption(outputFileOption);
 
+    Option inputCsvFileOption =
+        Option.builder(INPUT_CSV_FILE_OPTION_NAME)
+            .argName(INPUT_CSV_FILE_OPTION_NAME)
+            .hasArg()
+            .required(false)
+            .desc("path to csv file with input queries")
+            .build();
+    options.addOption(inputCsvFileOption);
+
     return options;
   }
 
   public Iterator<InputQuery> getInputQueries() {
     try {
       if (cmd.hasOption(READ_FROM_INFO_SCHEMA_FLAG_NAME)) {
-        return new InformationSchemaQueryIterable(cmd.getOptionValue(
-            PROCESSING_PROJECT_ID_OPTION_NAME));
+        return new InformationSchemaQueryIterable(
+            cmd.getOptionValue(PROCESSING_PROJECT_ID_OPTION_NAME));
       } else if (cmd.hasOption(QUERY_OPTION_NAME)) {
         return buildIteratorFromQueryStr(cmd.getOptionValue(QUERY_OPTION_NAME));
       } else if (cmd.hasOption(FILE_PATH_OPTION_NAME)) {
         return buildIteratorFromFilePath(cmd.getOptionValue(FILE_PATH_OPTION_NAME));
       } else if (cmd.hasOption(FOLDER_PATH_OPTION_NAME)) {
         return buildIteratorFromFolderPath(cmd.getOptionValue(FOLDER_PATH_OPTION_NAME));
+      } else if (cmd.hasOption(INPUT_CSV_FILE_OPTION_NAME)) {
+        return new InputCsvQueryIterator(cmd.getOptionValue(INPUT_CSV_FILE_OPTION_NAME));
       }
-    } catch (InterruptedException e) {
+    } catch (InterruptedException | IOException e) {
       System.out.println(e.getMessage());
       System.exit(0);
     }
@@ -134,7 +151,7 @@ public class BQAntiPatternCMDParser {
   }
 
   public static Iterator<InputQuery> buildIteratorFromFolderPath(String folderPath) {
-    if (folderPath.startsWith("gs://")){
+    if (folderPath.startsWith("gs://")) {
       Storage storage = StorageOptions.newBuilder().build().getService();
       String trimFolderPathStr = folderPath.replace("gs://", "");
       List<String> list = new ArrayList(Arrays.asList(trimFolderPathStr.split("/")));
@@ -142,26 +159,25 @@ public class BQAntiPatternCMDParser {
       list.remove(0);
       String directoryPrefix = String.join("/", list) + "/";
       Page<Blob> blobs =
-              storage.list(
-                      bucket,
-                      Storage.BlobListOption.prefix(directoryPrefix),
-                      Storage.BlobListOption.currentDirectory());
+          storage.list(
+              bucket,
+              Storage.BlobListOption.prefix(directoryPrefix),
+              Storage.BlobListOption.currentDirectory());
       ArrayList gcsFileList = new ArrayList();
       for (Blob blob : blobs.iterateAll()) {
         String blobName = blob.getName();
-        if (blobName.equals(directoryPrefix)){
+        if (blobName.equals(directoryPrefix)) {
           continue;
         }
         gcsFileList.add("gs://" + bucket + "/" + blobName);
       }
       return new InputFolderQueryIterable(gcsFileList);
-    }
-    else{
+    } else {
       List<String> fileList =
-              Stream.of(new File(folderPath).listFiles())
-                      .filter(file -> file.isFile())
-                      .map(File::getAbsolutePath)
-                      .collect(Collectors.toList());
+          Stream.of(new File(folderPath).listFiles())
+              .filter(file -> file.isFile())
+              .map(File::getAbsolutePath)
+              .collect(Collectors.toList());
       return new InputFolderQueryIterable(fileList);
     }
   }

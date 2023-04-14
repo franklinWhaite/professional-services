@@ -17,6 +17,7 @@ public class OutputGenerator {
   }
   public static void writeOutputToCSV(List<String[]> outputData, BQAntiPatternCMDParser cmdParser) throws IOException {
     FileWriter csvWriter = new FileWriter(cmdParser.getOutputFileOptionName());
+    csvWriter.write(String.join(",", new String[]{"id", "query\n"}));
     for (String[] row : outputData) {
       csvWriter.write(String.join(",", row));
       csvWriter.write("\n");

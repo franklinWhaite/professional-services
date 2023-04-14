@@ -3,13 +3,13 @@ package com.google.zetasql.toolkit.antipattern.cmd;
 public class InputQuery {
 
   private String query;
-  private String path;
+  private String queryIdentifier;
   private String jobId;
   private float slotHours;
 
-  public InputQuery(String query, String inputFilePath) {
+  public InputQuery(String query, String queryIdentifier) {
     this.query = query;
-    this.path = inputFilePath;
+    this.queryIdentifier = queryIdentifier;
   }
 
   public InputQuery(String query, String jobId, float slotHours) {
@@ -22,8 +22,8 @@ public class InputQuery {
     return query;
   }
 
-  public String getPath() {
-    return path;
+  public String getQueryId() {
+    return queryIdentifier;
   }
 
   public String getJobId() {
