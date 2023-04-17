@@ -13,6 +13,11 @@ public class OutputGenerator {
       throws IOException {
     if(cmdParser.hasOutputFileOptionName()) {
       writeOutputToCSV(outputData, cmdParser);
+    } else {
+      for (String[] row : outputData) {
+        System.out.println("----------------------------------------");
+        System.out.println(String.join("\n", row));
+      }
     }
   }
   public static void writeOutputToCSV(List<String[]> outputData, BQAntiPatternCMDParser cmdParser) throws IOException {
