@@ -45,7 +45,7 @@ public class Main {
 
   private static String getRecommendations(ASTStatement parsedQuery) {
     ArrayList<String> recommendation = new ArrayList<>();
-    recommendation.add(new IdentifySelectStar().run(parsedQuery));
+    recommendation.add(new IdentifySimpleSelectStar().run(parsedQuery));
     recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
     recommendation.add(new IdentifyCrossJoin().run(parsedQuery));
     return recommendation.stream().filter(x-> x.length()>0).collect(Collectors.joining("\n"));
