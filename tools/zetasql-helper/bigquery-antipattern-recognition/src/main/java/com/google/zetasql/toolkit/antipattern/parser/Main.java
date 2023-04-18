@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.cli.ParseException;
 
-public class Main {
+public class Mainw {
 
   public static void main(String[] args) throws ParseException, IOException {
 
@@ -29,6 +29,7 @@ public class Main {
     while (inputQueriesIterator.hasNext()) {
       inputQuery = inputQueriesIterator.next();
       String query = inputQuery.getQuery();
+
 
       try {
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
