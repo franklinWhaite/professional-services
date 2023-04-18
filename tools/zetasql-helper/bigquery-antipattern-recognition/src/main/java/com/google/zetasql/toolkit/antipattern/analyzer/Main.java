@@ -43,7 +43,7 @@ public class Main {
     BQAntiPatternCMDParser bqAntiPatternCMDParser = new BQAntiPatternCMDParser(args);
     Iterator<InputQuery> inputQueryIterator =  bqAntiPatternCMDParser.getInputQueries();
 
-    processQueries(catalog, options, analyzer, inputQueryIterator, bqAntiPatternCMDParser.getOutputTableProjectId());
+    processQueries(catalog, options, analyzer, inputQueryIterator, bqAntiPatternCMDParser.getProcessingProject());
 
   }
 
@@ -83,13 +83,13 @@ public class Main {
 
       // Create a map of rows to insert
       Map<String, Object> rowContent = new HashMap<>();
-      rowContent.put("job_id", inputQuery.getJobId());
+      rowContent.put("job_id", inputQuery.getQueryId());
       rowContent.put("query", query);
       rowContent.put("slot_hours", inputQuery.getSlotHours());
       rowContent.put("recommendation", recommendations);
       rowContent.put("process_timestamp", new DateTime(new Date()));
 
-      BigQueryHelper.writeResults(outputProjectId, rowContent);
+ //     BigQueryHelper.writeResults(outputProjectId, rowContent);
     }
   }
 }

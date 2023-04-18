@@ -26,6 +26,7 @@ public class Main {
 
     InputQuery inputQuery;
     List<String[]> outputData = new ArrayList<>();
+
     while (inputQueriesIterator.hasNext()) {
       inputQuery = inputQueriesIterator.next();
       String query = inputQuery.getQuery();
@@ -33,14 +34,32 @@ public class Main {
       try {
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
         String rec = getRecommendations(parsedQuery);
-        if(rec.length()>0){
-          outputData.add(new String[]{inputQuery.getQueryId(), "\""+rec+"\""});
-        }
+        addRecToOutput(cmdParser, outputData, inputQuery, rec);
       } catch (Exception e) {
-        outputData.add(new String[]{inputQuery.getQueryId(), "error"});
+        outputData.add(new String[] {inputQuery.getQueryId(), "error"});
       }
     }
     OutputGenerator.writeOutput(cmdParser, outputData);
+  }
+
+  private static void addRecToOutput(
+      BQAntiPatternCMDParser cmdParser,
+      List<String[]> outputData,
+      InputQuery inputQuery,
+      String rec) {
+    if (rec.length() > 0) {
+      if (cmdParser.isReadingFromInfoSchema()) {
+        outputData.add(
+            new String[] {
+              inputQuery.getQueryId(),
+              inputQuery.getQuery(),
+              Float.toString(inputQuery.getSlotHours()),
+              "\"" + rec + "\"",
+            });
+      } else {
+        outputData.add(new String[] {inputQuery.getQueryId(), "\"" + rec + "\""});
+      }
+    }
   }
 
   private static String getRecommendations(ASTStatement parsedQuery) {
@@ -48,8 +67,6 @@ public class Main {
     recommendation.add(new IdentifySimpleSelectStar().run(parsedQuery));
     recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
     recommendation.add(new IdentifyCrossJoin().run(parsedQuery));
-    return recommendation.stream().filter(x-> x.length()>0).collect(Collectors.joining("\n"));
+    return recommendation.stream().filter(x -> x.length() > 0).collect(Collectors.joining("\n"));
   }
 }
-
-

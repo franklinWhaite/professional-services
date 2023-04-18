@@ -11,7 +11,12 @@ public class InformationSchemaQueryIterable implements Iterator<InputQuery> {
   Iterator<FieldValueList> fieldValueListIterator;
 
   public InformationSchemaQueryIterable(String project_id) throws InterruptedException {
-    TableResult tableResult = BigQueryHelper.getQueries(project_id);
+    TableResult tableResult = BigQueryHelper.getQueries(project_id, "30");
+    fieldValueListIterator = tableResult.iterateAll().iterator();
+  }
+
+  public InformationSchemaQueryIterable(String project_id, String daysBack) throws InterruptedException {
+    TableResult tableResult = BigQueryHelper.getQueries(project_id, daysBack);
     fieldValueListIterator = tableResult.iterateAll().iterator();
   }
 
