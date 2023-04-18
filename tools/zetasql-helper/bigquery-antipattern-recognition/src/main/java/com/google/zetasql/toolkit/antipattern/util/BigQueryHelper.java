@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class BigQueryHelper {
 
-  public static TableResult getQueries(String projectId, String daysBack) throws InterruptedException {
+  public static TableResult getQueries(String projectId, String daysBack, String ISTable) throws InterruptedException {
     BigQuery bigquery = BigQueryOptions.newBuilder().setProjectId(projectId).build().getService();
     QueryJobConfiguration queryConfig =
         QueryJobConfiguration.newBuilder(
@@ -22,7 +22,7 @@ public class BigQueryHelper {
                     + "  query, \n"
                     + "  total_slot_ms / (1000 * 60 * 60 ) AS slot_hours\n"
                     + "FROM\n"
-                    + "  `region-us`.INFORMATION_SCHEMA.JOBS\n"
+                    + ISTable + "\n"
                     + "WHERE \n"
                     + "  start_time >= CURRENT_TIMESTAMP - INTERVAL "+ daysBack + " DAY\n"
                     + "  AND total_slot_ms > 0\n"
