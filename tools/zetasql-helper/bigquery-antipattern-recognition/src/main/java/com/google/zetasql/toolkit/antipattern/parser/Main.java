@@ -25,22 +25,24 @@ public class Main {
     Iterator<InputQuery> inputQueriesIterator = cmdParser.getInputQueries();
 
     InputQuery inputQuery;
-    List<String[]> outputData = new ArrayList<>();
 
     while (inputQueriesIterator.hasNext()) {
       inputQuery = inputQueriesIterator.next();
       String query = inputQuery.getQuery();
-
+      List<String[]> outputData = new ArrayList<>();
 
       try {
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
         String rec = getRecommendations(parsedQuery);
-        addRecToOutput(cmdParser, outputData, inputQuery, rec);
+        if (rec.length() > 0) {
+          addRecToOutput(cmdParser, outputData, inputQuery, rec);
+          OutputGenerator.writeOutput(cmdParser, outputData);
+        }
       } catch (Exception e) {
         outputData.add(new String[] {inputQuery.getQueryId(), "error"});
       }
     }
-    OutputGenerator.writeOutput(cmdParser, outputData);
+
   }
 
   private static void addRecToOutput(
@@ -48,7 +50,6 @@ public class Main {
       List<String[]> outputData,
       InputQuery inputQuery,
       String rec) {
-    if (rec.length() > 0) {
       if (cmdParser.isReadingFromInfoSchema()) {
         outputData.add(
             new String[] {
@@ -60,7 +61,6 @@ public class Main {
       } else {
         outputData.add(new String[] {inputQuery.getQueryId(), "\"" + rec + "\""});
       }
-    }
   }
 
   private static String getRecommendations(ASTStatement parsedQuery) {
