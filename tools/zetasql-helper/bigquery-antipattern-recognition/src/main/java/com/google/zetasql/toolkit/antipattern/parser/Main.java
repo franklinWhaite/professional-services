@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.cli.ParseException;
 
-public class Mainw {
+public class Main {
 
   public static void main(String[] args) throws ParseException, IOException {
 
