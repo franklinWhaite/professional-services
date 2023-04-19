@@ -31,6 +31,7 @@ public class Main {
       inputQuery = inputQueriesIterator.next();
       String query = inputQuery.getQuery();
 
+
       try {
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
         String rec = getRecommendations(parsedQuery);
@@ -67,6 +68,8 @@ public class Main {
     recommendation.add(new IdentifySimpleSelectStar().run(parsedQuery));
     recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
     recommendation.add(new IdentifyCrossJoin().run(parsedQuery));
-    return recommendation.stream().filter(x -> x.length() > 0).collect(Collectors.joining("\n"));
+    recommendation.add(new IdentifyCTEsEvalMultipleTimes().run(parsedQuery));
+    return recommendation.stream().filter(x-> x.length()>0).collect(Collectors.joining("\n"));
+
   }
 }
