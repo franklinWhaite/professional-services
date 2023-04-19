@@ -189,6 +189,7 @@ public class BQAntiPatternCMDParser {
           cmd.getOptionValue(PROCESSING_PROJECT_ID_OPTION_NAME));
     }
   }
+
   public static Iterator<InputQuery> buildIteratorFromQueryStr(String queryStr) {
     InputQuery inputQuery = new InputQuery(queryStr, "inline query");
     return (new ArrayList<>(Arrays.asList(inputQuery))).iterator();
