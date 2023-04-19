@@ -13,7 +13,7 @@ public class IdentifyCTEsEvalMultipleTimesVisitor extends ParseTreeVisitor {
 
   // A string template to be used for generating the suggestion message.
   private final String MULTIPLE_CTE_SUGGESTION_MESSAGE =
-      "Your query uses CTE alias %s which is referenced %d times.";
+      "CTE with multiple references: alias %s is referenced %d times.";
 
   // An array list to store the suggestions.
   private ArrayList<String> result = new ArrayList<String>();
