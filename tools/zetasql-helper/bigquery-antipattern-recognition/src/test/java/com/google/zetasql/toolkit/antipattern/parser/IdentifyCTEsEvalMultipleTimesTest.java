@@ -21,7 +21,7 @@ public class IdentifyCTEsEvalMultipleTimesTest {
   // Test with a query that uses two CTEs aliased (b,c) referencing CTE aliased (a) multiple times
   @Test
   public void withThreeCTEsTest() {
-    String expected = "Your query uses CTE alias a which is referenced 2 times.";
+    String expected = "CTE with multiple references: alias a is referenced 2 times.";
     String query = "WITH\n" +
         "    a AS (\n" +
         "        SELECT\n" +
@@ -56,7 +56,7 @@ public class IdentifyCTEsEvalMultipleTimesTest {
   // Test with a query that uses one CTE aliased (a) referenced  multiple times in from clause and a subquery
   @Test
   public void withOneCTETest() {
-    String expected = "Your query uses CTE alias a which is referenced 2 times.";
+    String expected = "CTE with multiple references: alias a is referenced 2 times.";
     String query = "WITH\n" +
         "  a AS (\n" +
         "  SELECT\n" +
