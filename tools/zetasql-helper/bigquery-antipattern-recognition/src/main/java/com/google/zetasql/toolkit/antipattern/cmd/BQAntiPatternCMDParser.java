@@ -20,8 +20,11 @@ public class BQAntiPatternCMDParser {
   public static final String INPUT_CSV_FILE_OPTION_NAME = "input_csv_file_path";
   public static final String OUTPUT_FILE_OPTION_NAME = "output_file_path";
   public static final String READ_FROM_INFO_SCHEMA_FLAG_NAME = "read_from_info_schema";
+  public static final String READ_FROM_INFO_SCHEMA_DAYS_OPTION_NAME = "read_from_info_schema_days";
+  public static final String READ_FROM_INFO_SCHEMA_TABLE_OPTION_NAME =
+      "info_schema_table_name";
   public static final String PROCESSING_PROJECT_ID_OPTION_NAME = "processing_project_id";
-  public static final String OUTPUT_PROJECT_ID_OPTION_NAME = "output_project_id";
+  public static final String OUTPUT_TABLE_OPTION_NAME = "output_table";
 
   private Options options;
   private CommandLine cmd;
@@ -32,8 +35,12 @@ public class BQAntiPatternCMDParser {
     cmd = parser.parse(options, args);
   }
 
-  public String getOutputTableProjectId() {
-    return cmd.getOptionValue(OUTPUT_PROJECT_ID_OPTION_NAME);
+  public String getOutputTable() {
+    return cmd.getOptionValue(OUTPUT_TABLE_OPTION_NAME);
+  }
+
+  public String getProcessingProject() {
+    return cmd.getOptionValue(PROCESSING_PROJECT_ID_OPTION_NAME);
   }
 
   public String getOutputFileOptionName() {
@@ -42,6 +49,14 @@ public class BQAntiPatternCMDParser {
 
   public boolean hasOutputFileOptionName() {
     return cmd.hasOption(OUTPUT_FILE_OPTION_NAME);
+  }
+
+  public boolean isReadingFromInfoSchema() {
+    return cmd.hasOption(READ_FROM_INFO_SCHEMA_FLAG_NAME);
+  }
+
+  public boolean hasOutputTable() {
+    return cmd.hasOption(OUTPUT_TABLE_OPTION_NAME);
   }
 
   public Options getOptions() {
@@ -90,14 +105,14 @@ public class BQAntiPatternCMDParser {
             .build();
     options.addOption(procesingProjectOption);
 
-    Option outputProjectOption =
-        Option.builder(OUTPUT_PROJECT_ID_OPTION_NAME)
-            .argName(OUTPUT_PROJECT_ID_OPTION_NAME)
+    Option outputTableOption =
+        Option.builder(OUTPUT_TABLE_OPTION_NAME)
+            .argName(OUTPUT_TABLE_OPTION_NAME)
             .hasArg()
             .required(false)
             .desc("project with the table to which output will be written")
             .build();
-    options.addOption(outputProjectOption);
+    options.addOption(outputTableOption);
 
     Option outputFileOption =
         Option.builder(OUTPUT_FILE_OPTION_NAME)
@@ -117,14 +132,31 @@ public class BQAntiPatternCMDParser {
             .build();
     options.addOption(inputCsvFileOption);
 
+    Option infoSchemaDays =
+        Option.builder(READ_FROM_INFO_SCHEMA_DAYS_OPTION_NAME)
+            .argName(READ_FROM_INFO_SCHEMA_DAYS_OPTION_NAME)
+            .hasArg()
+            .required(false)
+            .desc("Specifies how many days back should INFORMATION SCHEMA be queried for")
+            .build();
+    options.addOption(infoSchemaDays);
+
+    Option infoSchemaTable =
+        Option.builder(READ_FROM_INFO_SCHEMA_TABLE_OPTION_NAME)
+            .argName(READ_FROM_INFO_SCHEMA_TABLE_OPTION_NAME)
+            .hasArg()
+            .required(false)
+            .desc("Specifies how many days back should INFORMATION SCHEMA be queried for")
+            .build();
+    options.addOption(infoSchemaTable);
+
     return options;
   }
 
   public Iterator<InputQuery> getInputQueries() {
     try {
       if (cmd.hasOption(READ_FROM_INFO_SCHEMA_FLAG_NAME)) {
-        return new InformationSchemaQueryIterable(
-            cmd.getOptionValue(PROCESSING_PROJECT_ID_OPTION_NAME));
+        return readFromIS();
       } else if (cmd.hasOption(QUERY_OPTION_NAME)) {
         return buildIteratorFromQueryStr(cmd.getOptionValue(QUERY_OPTION_NAME));
       } else if (cmd.hasOption(FILE_PATH_OPTION_NAME)) {
@@ -134,11 +166,28 @@ public class BQAntiPatternCMDParser {
       } else if (cmd.hasOption(INPUT_CSV_FILE_OPTION_NAME)) {
         return new InputCsvQueryIterator(cmd.getOptionValue(INPUT_CSV_FILE_OPTION_NAME));
       }
-    } catch (InterruptedException | IOException e) {
+    } catch (IOException | InterruptedException e) {
       System.out.println(e.getMessage());
       System.exit(0);
     }
     return null;
+  }
+
+  private Iterator<InputQuery> readFromIS() throws InterruptedException {
+    if (cmd.hasOption(READ_FROM_INFO_SCHEMA_DAYS_OPTION_NAME)
+        && cmd.hasOption(READ_FROM_INFO_SCHEMA_TABLE_OPTION_NAME)) {
+      return new InformationSchemaQueryIterable(
+          cmd.getOptionValue(PROCESSING_PROJECT_ID_OPTION_NAME),
+          cmd.getOptionValue(READ_FROM_INFO_SCHEMA_DAYS_OPTION_NAME),
+          cmd.getOptionValue(READ_FROM_INFO_SCHEMA_TABLE_OPTION_NAME));
+    } else if (cmd.hasOption(READ_FROM_INFO_SCHEMA_FLAG_NAME)) {
+      return new InformationSchemaQueryIterable(
+          cmd.getOptionValue(PROCESSING_PROJECT_ID_OPTION_NAME),
+          cmd.getOptionValue(READ_FROM_INFO_SCHEMA_DAYS_OPTION_NAME));
+    } else {
+      return new InformationSchemaQueryIterable(
+          cmd.getOptionValue(PROCESSING_PROJECT_ID_OPTION_NAME));
+    }
   }
 
   public static Iterator<InputQuery> buildIteratorFromQueryStr(String queryStr) {

@@ -70,7 +70,7 @@
                 <configuration>
                     <container>
                         <mainClass>
-                            com.google.zetasql.toolkit.antipattern.analyzer.Main
+                            com.google.zetasql.toolkit.antipattern.parser.Main
                         </mainClass>
                     </container>
                     <from>
