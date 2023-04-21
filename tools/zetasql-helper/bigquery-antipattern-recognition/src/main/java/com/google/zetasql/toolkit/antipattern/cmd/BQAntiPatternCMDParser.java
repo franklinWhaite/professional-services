@@ -1,5 +1,6 @@
 package com.google.zetasql.toolkit.antipattern.cmd;
 
+import com.google.zetasql.toolkit.antipattern.parser.Main;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -11,8 +12,12 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.api.gax.paging.Page;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BQAntiPatternCMDParser {
+
+  private static final Logger logger = LoggerFactory.getLogger(BQAntiPatternCMDParser.class);
 
   public static final String QUERY_OPTION_NAME = "query";
   public static final String FILE_PATH_OPTION_NAME = "input_file_path";
@@ -156,14 +161,19 @@ public class BQAntiPatternCMDParser {
   public Iterator<InputQuery> getInputQueries() {
     try {
       if (cmd.hasOption(READ_FROM_INFO_SCHEMA_FLAG_NAME)) {
+        logger.info("Using INFORMATION_SCHEMA as input source");
         return readFromIS();
       } else if (cmd.hasOption(QUERY_OPTION_NAME)) {
+        logger.info("Using inline query as input source");
         return buildIteratorFromQueryStr(cmd.getOptionValue(QUERY_OPTION_NAME));
       } else if (cmd.hasOption(FILE_PATH_OPTION_NAME)) {
+        logger.info("Using sql file as input source");
         return buildIteratorFromFilePath(cmd.getOptionValue(FILE_PATH_OPTION_NAME));
       } else if (cmd.hasOption(FOLDER_PATH_OPTION_NAME)) {
+        logger.info("Using folder as input source");
         return buildIteratorFromFolderPath(cmd.getOptionValue(FOLDER_PATH_OPTION_NAME));
       } else if (cmd.hasOption(INPUT_CSV_FILE_OPTION_NAME)) {
+        logger.info("Using csv file as input source");
         return new InputCsvQueryIterator(cmd.getOptionValue(INPUT_CSV_FILE_OPTION_NAME));
       }
     } catch (IOException | InterruptedException e) {
@@ -201,6 +211,7 @@ public class BQAntiPatternCMDParser {
 
   public static Iterator<InputQuery> buildIteratorFromFolderPath(String folderPath) {
     if (folderPath.startsWith("gs://")) {
+      logger.info("Reading input folder from GCS");
       Storage storage = StorageOptions.newBuilder().build().getService();
       String trimFolderPathStr = folderPath.replace("gs://", "");
       List<String> list = new ArrayList(Arrays.asList(trimFolderPathStr.split("/")));
@@ -222,6 +233,7 @@ public class BQAntiPatternCMDParser {
       }
       return new InputFolderQueryIterable(gcsFileList);
     } else {
+      logger.info("Reading input folder from local");
       List<String> fileList =
           Stream.of(new File(folderPath).listFiles())
               .filter(file -> file.isFile())

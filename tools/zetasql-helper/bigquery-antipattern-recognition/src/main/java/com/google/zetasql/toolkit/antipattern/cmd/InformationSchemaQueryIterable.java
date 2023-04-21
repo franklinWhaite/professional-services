@@ -3,7 +3,6 @@ package com.google.zetasql.toolkit.antipattern.cmd;
 import com.google.cloud.bigquery.FieldValueList;
 import com.google.cloud.bigquery.TableResult;
 import com.google.zetasql.toolkit.antipattern.util.BigQueryHelper;
-import java.nio.file.Files;
 import java.util.Iterator;
 
 public class InformationSchemaQueryIterable implements Iterator<InputQuery> {

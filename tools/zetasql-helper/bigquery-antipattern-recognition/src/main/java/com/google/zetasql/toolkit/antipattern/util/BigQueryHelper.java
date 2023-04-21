@@ -9,10 +9,15 @@ import com.google.cloud.bigquery.QueryJobConfiguration;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableResult;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BigQueryHelper {
 
+  private static final Logger logger = LoggerFactory.getLogger(BigQueryHelper.class);
+
   public static TableResult getQueries(String projectId, String daysBack, String ISTable) throws InterruptedException {
+    logger.info("Running job on project {}, reading from: {}, scanning last {} days.", projectId, ISTable, daysBack);
     BigQuery bigquery = BigQueryOptions.newBuilder().setProjectId(projectId).build().getService();
     QueryJobConfiguration queryConfig =
         QueryJobConfiguration.newBuilder(
