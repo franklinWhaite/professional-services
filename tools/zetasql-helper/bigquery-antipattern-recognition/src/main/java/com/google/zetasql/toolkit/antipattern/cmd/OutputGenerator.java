@@ -4,6 +4,7 @@ import static com.google.zetasql.toolkit.antipattern.cmd.BQAntiPatternCMDParser.
 
 import com.google.api.client.util.DateTime;
 import com.google.zetasql.toolkit.antipattern.util.BigQueryHelper;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
@@ -29,8 +30,16 @@ public class OutputGenerator {
   }
 
   private static void writeOutputToCSV(List<String[]> outputData, BQAntiPatternCMDParser cmdParser) throws IOException {
-    FileWriter csvWriter = new FileWriter(cmdParser.getOutputFileOptionName());
-    csvWriter.write(String.join(",", new String[]{"id", "query\n"}));
+
+    FileWriter csvWriter;
+    File file = new File(cmdParser.getOutputFileOptionName());
+    if(file.exists()){
+      csvWriter = new FileWriter(file, true);
+    } else {
+      csvWriter = new FileWriter(file);
+      csvWriter.write(String.join(",", new String[]{"id", "query\n"}));
+    }
+
     for (String[] row : outputData) {
       csvWriter.write(String.join(",", row));
       csvWriter.write("\n");
