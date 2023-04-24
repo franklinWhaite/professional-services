@@ -52,6 +52,8 @@ public class Main {
         + "Queries read: {}. "
         + "Queries with anti-patterns: {}. "
         + "Queries that could not be parsed: {}.", countQueries, countAntiPatterns, countErrors);
+//    System.out.println(parsedQuery);
+//    System.out.println(rec);
   }
 
   private static void addRecToOutput(
@@ -74,6 +76,7 @@ public class Main {
 
   private static String getRecommendations(ASTStatement parsedQuery) {
     ArrayList<String> recommendation = new ArrayList<>();
+    recommendation.add(new IdentifySingleRowInserts().run(parsedQuery));
     recommendation.add(new IdentifySimpleSelectStar().run(parsedQuery));
     recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
     recommendation.add(new IdentifyCrossJoin().run(parsedQuery));
