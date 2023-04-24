@@ -37,4 +37,27 @@ public class IdentifyOrderByWithoutLimitTest {
     assertEquals(expected, recommendation);
   }
 
+  @Test
+  public void OrderByWithoutLimitOuterLayerTest() {
+    String expected = "Order By clause without Limit.";
+    String query = "SELECT \n" +
+            "  t1.col1, t1.col2, t2.col1\n" +
+            "FROM \n" +
+            "  table1 t1\n" +
+            "LEFT JOIN\n" +
+            "  (\n" +
+            "    SELECT\n" +
+            "      col1, col2\n" +
+            "    FROM\n" +
+            "      table2\n" +
+            "    LIMIT 1000\n" +
+            "  ) t2 ON t1.col1=t2.col1\n" +
+            "ORDER BY\n" +
+            "  t1.col1";
+    ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
+    String recommendation = new IdentifyOrderByWithoutLimit().run(parsedQuery);
+    assertEquals(expected, recommendation);
+  }
+
+
 }
