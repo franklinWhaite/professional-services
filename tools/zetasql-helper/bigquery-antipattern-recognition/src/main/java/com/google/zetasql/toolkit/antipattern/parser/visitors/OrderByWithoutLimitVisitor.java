@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class OrderByWithoutLimitVisitor extends ParseTreeVisitor {
 
   private final String ORDER_BY_SUGGESTION_MESSAGE =
-      "Order By clause without Limit.";
+      "ORDER BY clause without LIMIT.";
 
   private ArrayList<String> result = new ArrayList<String>();
   private ArrayList<String> resultToReturn = new ArrayList<String>();
