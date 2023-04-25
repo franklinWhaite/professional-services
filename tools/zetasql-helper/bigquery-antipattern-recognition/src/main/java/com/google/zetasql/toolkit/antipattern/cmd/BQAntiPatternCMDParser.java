@@ -161,20 +161,15 @@ public class BQAntiPatternCMDParser {
   public Iterator<InputQuery> getInputQueries() {
     try {
       if (cmd.hasOption(READ_FROM_INFO_SCHEMA_FLAG_NAME)) {
-        logger.info("Using INFORMATION_SCHEMA as input source");
         return readFromIS();
       } else if (cmd.hasOption(QUERY_OPTION_NAME)) {
-        logger.info("Using inline query as input source");
         return buildIteratorFromQueryStr(cmd.getOptionValue(QUERY_OPTION_NAME));
       } else if (cmd.hasOption(FILE_PATH_OPTION_NAME)) {
-        logger.info("Using sql file as input source");
         return buildIteratorFromFilePath(cmd.getOptionValue(FILE_PATH_OPTION_NAME));
       } else if (cmd.hasOption(FOLDER_PATH_OPTION_NAME)) {
-        logger.info("Using folder as input source");
         return buildIteratorFromFolderPath(cmd.getOptionValue(FOLDER_PATH_OPTION_NAME));
       } else if (cmd.hasOption(INPUT_CSV_FILE_OPTION_NAME)) {
-        logger.info("Using csv file as input source");
-        return new InputCsvQueryIterator(cmd.getOptionValue(INPUT_CSV_FILE_OPTION_NAME));
+        return buildIteratorFromCSV(cmd.getOptionValue(INPUT_CSV_FILE_OPTION_NAME));
       }
     } catch (IOException | InterruptedException e) {
       System.out.println(e.getMessage());
@@ -184,6 +179,7 @@ public class BQAntiPatternCMDParser {
   }
 
   private Iterator<InputQuery> readFromIS() throws InterruptedException {
+    logger.info("Using INFORMATION_SCHEMA as input source");
     if (cmd.hasOption(READ_FROM_INFO_SCHEMA_DAYS_OPTION_NAME)
         && cmd.hasOption(READ_FROM_INFO_SCHEMA_TABLE_OPTION_NAME)) {
       return new InformationSchemaQueryIterable(
@@ -201,15 +197,25 @@ public class BQAntiPatternCMDParser {
   }
 
   public static Iterator<InputQuery> buildIteratorFromQueryStr(String queryStr) {
+    logger.info("Using inline query as input source");
     InputQuery inputQuery = new InputQuery(queryStr, "inline query");
     return (new ArrayList<>(Arrays.asList(inputQuery))).iterator();
   }
 
   public static Iterator<InputQuery> buildIteratorFromFilePath(String filePath) {
+    logger.info("Using sql file as input source");
+    // Using the folder query iterator with a single file
     return new InputFolderQueryIterable(new ArrayList<>(Arrays.asList(filePath)));
   }
 
-  public static Iterator<InputQuery> buildIteratorFromFolderPath(String folderPath) {
+  private static Iterator<InputQuery> buildIteratorFromCSV(String inputCSVPath) throws IOException {
+    logger.info("Using csv file as input source");
+    return new InputCsvQueryIterator(inputCSVPath);
+  }
+
+
+  private static Iterator<InputQuery> buildIteratorFromFolderPath(String folderPath) {
+    logger.info("Using folder as input source");
     if (folderPath.startsWith("gs://")) {
       logger.info("Reading input folder from GCS");
       Storage storage = StorageOptions.newBuilder().build().getService();

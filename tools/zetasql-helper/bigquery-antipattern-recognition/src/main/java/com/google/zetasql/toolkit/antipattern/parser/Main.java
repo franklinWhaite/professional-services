@@ -6,7 +6,6 @@ import com.google.zetasql.parser.ASTNodes.ASTStatement;
 import com.google.zetasql.toolkit.antipattern.cmd.BQAntiPatternCMDParser;
 import com.google.zetasql.toolkit.antipattern.cmd.InputQuery;
 import com.google.zetasql.toolkit.antipattern.cmd.OutputGenerator;
-import com.google.zetasql.toolkit.antipattern.util.BigQueryHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;

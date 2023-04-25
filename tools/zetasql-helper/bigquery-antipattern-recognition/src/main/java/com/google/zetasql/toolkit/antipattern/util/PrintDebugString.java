@@ -14,14 +14,13 @@ public class PrintDebugString {
     languageOptions.enableMaximumLanguageFeatures();
     languageOptions.setSupportsAllStatementKinds();
 
-    String query =
-        "select * from table1 GROUP BY col1";
+    String query = "SELECT * FROM `project.dataset.table1` LIMIT 1000";
 
     ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
     System.out.println(parsedQuery);
     System.out.println(new IdentifySimpleSelectStar().run(parsedQuery));
-    System.out.println(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
-    System.out.println(new IdentifyCrossJoin().run(parsedQuery));
+    // System.out.println(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
+    // System.out.println(new IdentifyCrossJoin().run(parsedQuery));
 
   }
 }
