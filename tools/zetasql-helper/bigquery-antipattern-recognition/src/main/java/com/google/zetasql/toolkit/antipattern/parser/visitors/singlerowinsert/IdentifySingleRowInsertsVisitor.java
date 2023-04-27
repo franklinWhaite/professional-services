@@ -22,21 +22,21 @@ public class IdentifySingleRowInsertsVisitor extends ParseTreeVisitor {
         if(nodes.size() == 1 ){
             result.add(String.format(SINGLE_ROW_INSERTS));
         }
-        else{
-            result.add(String.format(OTHER_INSERT_PATTERN));
-        }
+//        else{
+//            result.add(String.format(OTHER_INSERT_PATTERN));
+//        }
     }
 
-    @Override
-    public void visit(ASTNodes.ASTInsertStatement node) {
-        ASTNodes.ASTInsertValuesRowList nodes = node.getRows();
-        if(nodes == null){
-            result.add(String.format(OTHER_INSERT_PATTERN));
-        }
-        else{
-            super.visit(node);
-        }
-    }
+//    @Override
+//    public void visit(ASTNodes.ASTInsertStatement node) {
+//        ASTNodes.ASTInsertValuesRowList nodes = node.getRows();
+//        if(nodes == null){
+//            result.add(String.format(OTHER_INSERT_PATTERN));
+//        }
+//        else{
+//            super.visit(node);
+//        }
+//    }
 
 
 }
