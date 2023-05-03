@@ -22,7 +22,7 @@ All columns on table: project.dataset.table1 are being selected. Please be sure 
 
 
 
-### Quick Start
+# Quick Start
 
 Prerequisites:
 * [gcloud CLI](https://cloud.google.com/sdk/gcloud)
@@ -78,9 +78,9 @@ docker run \
   --output_table "my-project.dataset.antipattern_output_table" 
 ```
 
-## Deploy to Cloud Run Jobs
+# Deploy to Cloud Run Jobs
 
-### Overview
+## Overview
 
 One option to deploy the BigQuery Anti Pattern Recognition tool is deploying to Cloud Run jobs. Cloud Run jobs can help you easily deploy the tool as a container and later trigger it, either manually or on a schedule.
 
@@ -89,7 +89,7 @@ In order to deploy the tool to Cloud Run Jobs, you'll need to:
 * Create the Cloud Run job using the container and your desired configuration
 * Trigger the job, either manually or on a schedule
 
-### Walkthrough
+## Walkthrough
 
 1. Setup deployment configuration
 
@@ -166,15 +166,15 @@ In order to deploy the tool to Cloud Run Jobs, you'll need to:
 
 
 
-## Flags and arguments
-### Specify Input
-#### To read inline query
+# Flags and arguments
+## Specify Input
+### To read inline query
 `--query="SELECT ... FROM ..."`
 <ul>
 To parse SQL string provided via CLI.
 </ul>
 
-#### To read from INFORMATION_SCHEMA
+### To read from INFORMATION_SCHEMA
 `--read_from_info_schema`
 <ul>
 To read input queries from INFORMATION_SCHEMA.JOBS.
@@ -192,7 +192,7 @@ Defaults to 1.
 Specifies what variant of INFORMATION_SCHEMA.JONS to read from.
 </ul>
 
-#### To read from a files
+### To read from a files
 `--input_file_path=/path/to/file.sql`
 <ul>
 Specifies path to file with SQL string to be parsed. Can be local file or GCS file.
@@ -211,7 +211,7 @@ Columns must be ""id,query"
 </ul>
 
 
-### Specify output
+## Specify output
 `--output_file_path=/path/to/output/file.csv`
 <ul>
 Specifies a CSV file as output, each row is a SQL string to be parsed.<br>
@@ -223,7 +223,7 @@ Columns are "id,recommendation"
 Specifies table to which write results to. Assumes that the table already exits.
 </ul>
 
-### Specify compute project
+## Specify compute project
 `--processing_project_id=<my-processing-project>`
 <ul>
 Specifies what project provides the compute used to read from INFORMATION_SCHEMA <br> 
@@ -233,9 +233,8 @@ Only needed if the input is INFORMATION_SCHEMA or if the output is a BQ table.
 
 
 
-
-## Anti patterns
-### Anti Pattern 1: Selecting all columns 
+# Anti patterns
+## Anti Pattern 1: Selecting all columns 
 Example:
 ```
 SELECT 
@@ -250,7 +249,7 @@ All columns on table: project.dataset.table1 are being selected. Please be sure 
 ```
 
 
-### Anti Pattern 2: Using CROSS JOINs when INNER JOINs are an option
+## Anti Pattern 2: Using CROSS JOINs when INNER JOINs are an option
 Example:
 ```
 SELECT
@@ -268,7 +267,7 @@ Output:
 CROSS JOIN between tables: project.dataset.table1 and project.dataset.table2. Try to change for a INNER JOIN if possible.
 ```
 
-### Anti Pattern 3: Not aggregating subquery in the WHERE clause,
+## Anti Pattern 3: Not aggregating subquery in the WHERE clause,
 Example:
 ```
 SELECT 
