@@ -1,5 +1,7 @@
 package com.google.zetasql.toolkit.antipattern.util;
 
+import com.google.api.gax.rpc.FixedHeaderProvider;
+import com.google.api.gax.rpc.HeaderProvider;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.InsertAllRequest;
@@ -8,17 +10,22 @@ import com.google.cloud.bigquery.JobInfo;
 import com.google.cloud.bigquery.QueryJobConfiguration;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.TableResult;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BigQueryHelper {
 
+  private static final String USER_AGENT_HEADER = "user-agent";
+  private static final String USER_AGENT_VALUE = "google-pso-tool/bq-anti-pattern-recognition/0.1.0";
+  private static final HeaderProvider headerProvider =
+      FixedHeaderProvider.create(ImmutableMap.of(USER_AGENT_HEADER, USER_AGENT_VALUE));
   private static final Logger logger = LoggerFactory.getLogger(BigQueryHelper.class);
 
   public static TableResult getQueries(String projectId, String daysBack, String ISTable) throws InterruptedException {
     logger.info("Running job on project {}, reading from: {}, scanning last {} days.", projectId, ISTable, daysBack);
-    BigQuery bigquery = BigQueryOptions.newBuilder().setProjectId(projectId).build().getService();
+    BigQuery bigquery = BigQueryOptions.newBuilder().setProjectId(projectId).setHeaderProvider(headerProvider).build().getService();
     QueryJobConfiguration queryConfig =
         QueryJobConfiguration.newBuilder(
                 "SELECT\n"
@@ -45,7 +52,7 @@ public class BigQueryHelper {
   public static void writeResults(String processingProject, String outputTable, Map<String, Object> rowContent) {
     String[] tableName = outputTable.split("\\.");
     TableId tableId = TableId.of(tableName[0], tableName[1], tableName[2]);
-    BigQuery bigquery = BigQueryOptions.newBuilder().setProjectId(processingProject).build().getService();
+    BigQuery bigquery = BigQueryOptions.newBuilder().setProjectId(processingProject).setHeaderProvider(headerProvider).build().getService();
     bigquery.insertAll(InsertAllRequest.newBuilder(tableId).addRow(rowContent).build());
   }
 }

@@ -6,7 +6,6 @@ import com.google.zetasql.parser.ASTNodes.ASTStatement;
 import com.google.zetasql.toolkit.antipattern.cmd.BQAntiPatternCMDParser;
 import com.google.zetasql.toolkit.antipattern.cmd.InputQuery;
 import com.google.zetasql.toolkit.antipattern.cmd.OutputGenerator;
-import com.google.zetasql.toolkit.antipattern.util.BigQueryHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -78,6 +77,7 @@ public class Main {
     recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
     recommendation.add(new IdentifyCrossJoin().run(parsedQuery));
     recommendation.add(new IdentifyCTEsEvalMultipleTimes().run(parsedQuery));
+    recommendation.add(new IdentifyOrderByWithoutLimit().run(parsedQuery));
     return recommendation.stream().filter(x -> x.length() > 0).collect(Collectors.joining("\n"));
   }
 }
