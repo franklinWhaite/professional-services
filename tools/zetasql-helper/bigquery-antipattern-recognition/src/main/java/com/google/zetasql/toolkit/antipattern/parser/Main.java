@@ -47,6 +47,7 @@ public class Main {
       }
       countQueries += 1;
     }
+
     logger.info("Processing finished."
         + "Queries read: {}. "
         + "Queries with anti-patterns: {}. "
@@ -78,6 +79,7 @@ public class Main {
     recommendation.add(new IdentifyCrossJoin().run(parsedQuery));
     recommendation.add(new IdentifyCTEsEvalMultipleTimes().run(parsedQuery));
     recommendation.add(new IdentifyOrderByWithoutLimit().run(parsedQuery));
+    recommendation.add(new IdentifyRegexpContains().run(parsedQuery));
     return recommendation.stream().filter(x -> x.length() > 0).collect(Collectors.joining("\n"));
   }
 }
