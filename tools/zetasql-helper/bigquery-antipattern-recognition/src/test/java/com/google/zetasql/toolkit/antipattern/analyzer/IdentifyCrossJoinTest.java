@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.zetasql.toolkit.antipattern.analyzer;
 
 import static com.google.zetasql.toolkit.antipattern.util.ZetaSQLHelperConstants.*;
@@ -11,7 +27,6 @@ import com.google.zetasql.SimpleTable;
 import com.google.zetasql.TypeFactory;
 import com.google.zetasql.ZetaSQLType;
 import com.google.zetasql.toolkit.ZetaSQLToolkitAnalyzer;
-import com.google.zetasql.toolkit.antipattern.analyzer.IdentifyCrossJoin;
 import com.google.zetasql.toolkit.catalog.bigquery.BigQueryCatalog;
 import com.google.zetasql.toolkit.options.BigQueryLanguageOptions;
 import java.util.List;
@@ -20,7 +35,7 @@ import org.junit.Test;
 
 public class IdentifyCrossJoinTest {
 
-  BigQueryCatalog bigQueryCatalog= new BigQueryCatalog("test-project");
+  BigQueryCatalog bigQueryCatalog = new BigQueryCatalog("test-project");
   SimpleCatalog catalog = bigQueryCatalog.getZetaSQLCatalog();
   ZetaSQLToolkitAnalyzer analyzer;
 
@@ -61,9 +76,7 @@ public class IdentifyCrossJoinTest {
             + "    `project.dataset.table2` t2 "
             + "WHERE "
             + "   t1.col1 = t2.col1 ";
-    String recommendation =
-        new IdentifyCrossJoin()
-            .run(query, bigQueryCatalog, analyzer);
+    String recommendation = new IdentifyCrossJoin().run(query, bigQueryCatalog, analyzer);
     assertEquals(expected, recommendation);
   }
 
@@ -87,9 +100,7 @@ public class IdentifyCrossJoinTest {
             + "   t1.col1 = t2.col1 "
             + "   AND t1.col1 = t3.col1 ";
 
-    String recommendation =
-        new IdentifyCrossJoin()
-            .run(query, bigQueryCatalog, analyzer);
+    String recommendation = new IdentifyCrossJoin().run(query, bigQueryCatalog, analyzer);
     assertEquals(expected, recommendation);
   }
 
@@ -104,9 +115,7 @@ public class IdentifyCrossJoinTest {
             + "CROSS JOIN "
             + "    `project.dataset.table2` t2 ";
 
-    String recommendation =
-        new IdentifyCrossJoin()
-            .run(query, bigQueryCatalog, analyzer);
+    String recommendation = new IdentifyCrossJoin().run(query, bigQueryCatalog, analyzer);
     assertEquals(expected, recommendation);
   }
 
@@ -124,9 +133,7 @@ public class IdentifyCrossJoinTest {
             + "    `project.dataset.table2` t2 "
             + "WHERE "
             + "   t1.col1 = t2.col1 ";
-    String recommendation =
-        new IdentifyCrossJoin()
-            .run(query, bigQueryCatalog, analyzer);
+    String recommendation = new IdentifyCrossJoin().run(query, bigQueryCatalog, analyzer);
     assertEquals(expected, recommendation);
   }
 
@@ -143,9 +150,7 @@ public class IdentifyCrossJoinTest {
             + "    (SELECT * FROM `project.dataset.table2`) t2 "
             + "WHERE "
             + "   t1.col1 = t2.col1 ";
-    String recommendation =
-        new IdentifyCrossJoin()
-            .run(query, bigQueryCatalog, analyzer);
+    String recommendation = new IdentifyCrossJoin().run(query, bigQueryCatalog, analyzer);
     assertEquals(expected, recommendation);
   }
 
@@ -165,9 +170,7 @@ public class IdentifyCrossJoinTest {
             + "    `project.dataset.table3` t3  "
             + "WHERE "
             + "   t1.col1 = t3.col1 ";
-    String recommendation =
-        new IdentifyCrossJoin()
-            .run(query, bigQueryCatalog, analyzer);
+    String recommendation = new IdentifyCrossJoin().run(query, bigQueryCatalog, analyzer);
     assertEquals(expected, recommendation);
   }
 
@@ -187,9 +190,7 @@ public class IdentifyCrossJoinTest {
             + "    (SELECT * FROM  `project.dataset.table3`) t3  "
             + "WHERE "
             + "   t1.col1 = t3.col1 ";
-    String recommendation =
-        new IdentifyCrossJoin()
-            .run(query, bigQueryCatalog, analyzer);
+    String recommendation = new IdentifyCrossJoin().run(query, bigQueryCatalog, analyzer);
     assertEquals(expected, recommendation);
   }
 
@@ -222,10 +223,7 @@ public class IdentifyCrossJoinTest {
             + " ) t11 ON t1.col1 = t11.col1 "
             + "WHERE "
             + "   t1.col1 = t3.col1 ";
-    String recommendation =
-        new IdentifyCrossJoin()
-            .run(query, bigQueryCatalog, analyzer);
+    String recommendation = new IdentifyCrossJoin().run(query, bigQueryCatalog, analyzer);
     assertEquals(expected, recommendation);
   }
-
 }
