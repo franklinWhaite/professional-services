@@ -16,7 +16,6 @@
 
 package com.google.zetasql.toolkit.antipattern.cmd;
 
-
 import com.google.api.client.util.DateTime;
 import com.google.zetasql.toolkit.antipattern.util.BigQueryHelper;
 import java.io.File;
