@@ -1,7 +1,7 @@
 package com.google.zetasql.toolkit.antipattern.parser;
 
 import com.google.zetasql.parser.ASTNodes.ASTStatement;
-import com.google.zetasql.toolkit.antipattern.parser.visitors.singlerowinsert.IdentifySingleRowInsertsVisitor;
+import com.google.zetasql.toolkit.antipattern.parser.visitors.IdentifySingleRowInsertsVisitor;
 import java.util.stream.Collectors;
 
 /**

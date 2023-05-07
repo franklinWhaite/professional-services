@@ -1,4 +1,4 @@
-package com.google.zetasql.toolkit.antipattern.parser.visitors.singlerowinsert;
+package com.google.zetasql.toolkit.antipattern.parser.visitors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.zetasql.parser.ASTNodes;
