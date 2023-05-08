@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -48,12 +50,12 @@ public class Main {
     while (inputQueriesIterator.hasNext()) {
       inputQuery = inputQueriesIterator.next();
       String query = inputQuery.getQuery();
-      List<String[]> outputData = new ArrayList<>();
+      List<Object[]> outputData = new ArrayList<>();
 
       try {
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
-        String rec = getRecommendations(parsedQuery);
-        if (rec.length() > 0) {
+        List<Map<String, String>> rec = getRecommendations(parsedQuery);
+        if (rec.size() > 0) {
           addRecToOutput(cmdParser, outputData, inputQuery, rec);
           OutputGenerator.writeOutput(cmdParser, outputData);
           countAntiPatterns += 1;
@@ -75,29 +77,51 @@ public class Main {
 
   private static void addRecToOutput(
       BQAntiPatternCMDParser cmdParser,
-      List<String[]> outputData,
+      List<Object[]> outputData,
       InputQuery inputQuery,
-      String rec) {
+      List<Map<String, String>> rec) {
     if (cmdParser.isReadingFromInfoSchema()) {
       outputData.add(
-          new String[] {
+          new Object[] {
             inputQuery.getQueryId(),
             inputQuery.getQuery(),
             Float.toString(inputQuery.getSlotHours()),
-            "\"" + rec + "\"",
+            rec,
           });
     } else {
-      outputData.add(new String[] {inputQuery.getQueryId(), "\"" + rec + "\""});
+      String output = rec.stream().map(m -> m.get("name") + ": \"" + m.getOrDefault("description", "") + "\"\n").collect(Collectors.joining());
+      outputData.add(new String[] {inputQuery.getQueryId(), output});
     }
   }
 
-  private static String getRecommendations(ASTStatement parsedQuery) {
-    ArrayList<String> recommendation = new ArrayList<>();
-    recommendation.add(new IdentifySimpleSelectStar().run(parsedQuery));
-    recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
-    recommendation.add(new IdentifyCrossJoin().run(parsedQuery));
-    recommendation.add(new IdentifyCTEsEvalMultipleTimes().run(parsedQuery));
-    recommendation.add(new IdentifyOrderByWithoutLimit().run(parsedQuery));
-    return recommendation.stream().filter(x -> x.length() > 0).collect(Collectors.joining("\n"));
+  private static List<Map<String, String>> getRecommendations(ASTStatement parsedQuery) {
+    List<Map<String, String>> recommendations = new ArrayList<>();
+    recommendations.add(new HashMap<>() {{
+      put("name", "SelectStar");
+      put("description", new IdentifySimpleSelectStar().run(parsedQuery));
+    }});
+    recommendations.add(new HashMap<>() {{
+      put("name", "SelectStar");
+      put("description", new IdentifySimpleSelectStar().run(parsedQuery));
+    }});
+    recommendations.add(new HashMap<>() {{
+      put("name", "SubqueryWithoutAgg");
+      put("description", new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
+    }});
+    recommendations.add(new HashMap<>() {{
+      put("name", "CrossJoin");
+      put("description", new IdentifyCrossJoin().run(parsedQuery));
+    }});
+    recommendations.add(new HashMap<>() {{
+      put("name", "CTEsEvalMultipleTimes");
+      put("description", new IdentifyCTEsEvalMultipleTimes().run(parsedQuery));
+    }});
+    recommendations.add(new HashMap<>() {{
+      put("name", "OrderByWithoutLimit");
+      put("description", new IdentifyOrderByWithoutLimit().run(parsedQuery));
+    }});
+
+    recommendations.removeIf(m -> m.get("description").isEmpty());
+    return recommendations;
   }
 }
