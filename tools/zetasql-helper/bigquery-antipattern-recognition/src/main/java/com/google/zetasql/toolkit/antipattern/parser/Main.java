@@ -52,7 +52,7 @@ public class Main {
 
       try {
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
-        String rec = getRecommendations(parsedQuery);
+        String rec = getRecommendations(parsedQuery, query);
         if (rec.length() > 0) {
           addRecToOutput(cmdParser, outputData, inputQuery, rec);
           OutputGenerator.writeOutput(cmdParser, outputData);
@@ -91,13 +91,13 @@ public class Main {
     }
   }
 
-  private static String getRecommendations(ASTStatement parsedQuery) {
+  private static String getRecommendations(ASTStatement parsedQuery, String query) {
     ArrayList<String> recommendation = new ArrayList<>();
     recommendation.add(new IdentifySimpleSelectStar().run(parsedQuery));
-    recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
-    recommendation.add(new IdentifyCrossJoin().run(parsedQuery));
-    recommendation.add(new IdentifyCTEsEvalMultipleTimes().run(parsedQuery));
-    recommendation.add(new IdentifyOrderByWithoutLimit().run(parsedQuery));
+    recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery, query));
+    recommendation.add(new IdentifyCrossJoin().run(parsedQuery, query));
+    recommendation.add(new IdentifyCTEsEvalMultipleTimes().run(parsedQuery, query));
+    recommendation.add(new IdentifyOrderByWithoutLimit().run(parsedQuery, query));
     return recommendation.stream().filter(x -> x.length() > 0).collect(Collectors.joining("\n"));
   }
 }
