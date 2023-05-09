@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.zetasql.toolkit.antipattern.parser.visitors;
 
 import com.google.zetasql.parser.ASTNodes;
@@ -18,20 +34,33 @@ public class IdentifySimpleSelectStarVisitor extends ParseTreeVisitor {
 
   @Override
   public void visit(ASTNodes.ASTSelect selectNode) {
-    selectNode.getSelectList().getColumns().forEach(selectColumnNode -> {
-      if(selectColumnNode.getExpression().nodeKindString().equals(SELECT_STAR_NODE_KIND_STRING)) {
-        if(selectNode.getFromClause().getTableExpression() instanceof ASTTablePathExpression) {
-          String idString = ((ASTTablePathExpression) selectNode.getFromClause().getTableExpression()).getPathExpr().getNames().get(0).getIdString();
-          result.add(String.format(SUGGESTION_MESSAGE, idString));
-        }
-      }
-    });
+    selectNode
+        .getSelectList()
+        .getColumns()
+        .forEach(
+            selectColumnNode -> {
+              if (selectColumnNode
+                  .getExpression()
+                  .nodeKindString()
+                  .equals(SELECT_STAR_NODE_KIND_STRING)) {
+                if (selectNode.getFromClause().getTableExpression()
+                    instanceof ASTTablePathExpression) {
+                  String idString =
+                      ((ASTTablePathExpression) selectNode.getFromClause().getTableExpression())
+                          .getPathExpr()
+                          .getNames()
+                          .get(0)
+                          .getIdString();
+                  result.add(String.format(SUGGESTION_MESSAGE, idString));
+                }
+              }
+            });
     super.visit(selectNode);
   }
 
   @Override
   public void visit(ASTNodes.ASTFromClause node) {
-    if((!foundFrom) && isSimpleSelect){
+    if ((!foundFrom) && isSimpleSelect) {
       foundFrom = true;
       super.visit(node);
     } else {
@@ -41,12 +70,12 @@ public class IdentifySimpleSelectStarVisitor extends ParseTreeVisitor {
 
   @Override
   public void visit(ASTNodes.ASTGroupBy node) {
-      isSimpleSelect = false;
+    isSimpleSelect = false;
   }
 
   @Override
   public void visit(ASTNodes.ASTJoin node) {
-    if((!foundJoin) && isSimpleSelect){
+    if ((!foundJoin) && isSimpleSelect) {
       foundJoin = true;
       super.visit(node);
     } else {
@@ -55,13 +84,10 @@ public class IdentifySimpleSelectStarVisitor extends ParseTreeVisitor {
   }
 
   public ArrayList<String> getResult() {
-    if(isSimpleSelect) {
+    if (isSimpleSelect) {
       return result;
     } else {
       return new ArrayList<String>();
     }
-
   }
-
-
 }

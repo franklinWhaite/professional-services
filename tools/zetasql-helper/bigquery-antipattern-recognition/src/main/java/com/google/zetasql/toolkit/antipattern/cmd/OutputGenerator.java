@@ -1,6 +1,20 @@
-package com.google.zetasql.toolkit.antipattern.cmd;
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import static com.google.zetasql.toolkit.antipattern.cmd.BQAntiPatternCMDParser.OUTPUT_FILE_OPTION_NAME;
+package com.google.zetasql.toolkit.antipattern.cmd;
 
 import com.google.api.client.util.DateTime;
 import com.google.zetasql.toolkit.antipattern.util.BigQueryHelper;
@@ -14,10 +28,9 @@ import java.util.Map;
 
 public class OutputGenerator {
 
-
   public static void writeOutput(BQAntiPatternCMDParser cmdParser, List<String[]> outputData)
       throws IOException {
-    if(cmdParser.hasOutputFileOptionName()) {
+    if (cmdParser.hasOutputFileOptionName()) {
       writeOutputToCSV(outputData, cmdParser);
     } else if (cmdParser.isReadingFromInfoSchema() && cmdParser.hasOutputTable()) {
       writeOutputToBQTable(outputData, cmdParser);
@@ -29,15 +42,16 @@ public class OutputGenerator {
     }
   }
 
-  private static void writeOutputToCSV(List<String[]> outputData, BQAntiPatternCMDParser cmdParser) throws IOException {
+  private static void writeOutputToCSV(List<String[]> outputData, BQAntiPatternCMDParser cmdParser)
+      throws IOException {
 
     FileWriter csvWriter;
     File file = new File(cmdParser.getOutputFileOptionName());
-    if(file.exists()){
+    if (file.exists()) {
       csvWriter = new FileWriter(file, true);
     } else {
       csvWriter = new FileWriter(file);
-      csvWriter.write(String.join(",", new String[]{"id", "query\n"}));
+      csvWriter.write(String.join(",", new String[] {"id", "query\n"}));
     }
 
     for (String[] row : outputData) {
@@ -47,7 +61,8 @@ public class OutputGenerator {
     csvWriter.close();
   }
 
-  private static void writeOutputToBQTable(List<String[]> outputData, BQAntiPatternCMDParser cmdParser) {
+  private static void writeOutputToBQTable(
+      List<String[]> outputData, BQAntiPatternCMDParser cmdParser) {
     DateTime date = new DateTime(new Date());
     for (String[] row : outputData) {
       Map<String, Object> rowContent = new HashMap<>();
@@ -56,7 +71,8 @@ public class OutputGenerator {
       rowContent.put("slot_hours", row[2]);
       rowContent.put("recommendation", row[3]);
       rowContent.put("process_timestamp", date);
-      BigQueryHelper.writeResults(cmdParser.getProcessingProject(), cmdParser.getOutputTable(), rowContent);
+      BigQueryHelper.writeResults(
+          cmdParser.getProcessingProject(), cmdParser.getOutputTable(), rowContent);
     }
   }
 }

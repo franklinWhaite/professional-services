@@ -1,19 +1,35 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.zetasql.toolkit.antipattern.parser.visitors;
 
 import com.google.zetasql.parser.ASTNodes.ASTSelect;
 import com.google.zetasql.parser.ASTNodes.ASTTablePathExpression;
 import com.google.zetasql.parser.ASTNodes.ASTWithClause;
 import com.google.zetasql.parser.ParseTreeVisitor;
+import com.google.zetasql.toolkit.antipattern.util.ZetaSQLStringParsingHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 
 public class IdentifyCTEsEvalMultipleTimesVisitor extends ParseTreeVisitor {
 
   // A string template to be used for generating the suggestion message.
   private final String MULTIPLE_CTE_SUGGESTION_MESSAGE =
-      "CTE with multiple references: alias %s is referenced %d times.";
+      "CTE with multiple references: alias %s defined at line %d is referenced %d times.";
 
   // An array list to store the suggestions.
   private ArrayList<String> result = new ArrayList<String>();
@@ -21,38 +37,56 @@ public class IdentifyCTEsEvalMultipleTimesVisitor extends ParseTreeVisitor {
   // A map to keep track of the number of times each CTE is evaluated.
   private Map<String, Integer> cteCountMap = new HashMap<>();
 
+  // A map to keep track of the number of times each CTE is evaluated.
+  private Map<String, Integer> cteStartPositionMap = new HashMap<>();
 
+  private String query;
+
+  public IdentifyCTEsEvalMultipleTimesVisitor(String query) {
+    this.query = query;
+  }
   @Override
   public void visit(ASTWithClause withClause) {
 
     // Loop through all the CTE entries in the WITH clause.
-    withClause.getWith().forEach(alias -> {
+    withClause
+        .getWith()
+        .forEach(
+            alias -> {
 
-      // Add the CTE name to the count map with initial count 0.
-      cteCountMap.put(alias.getAlias().getIdString().toLowerCase(),0);
+              // Add the CTE name to the count map with initial count 0.
+              cteCountMap.put(alias.getAlias().getIdString().toLowerCase(), 0);
+              cteStartPositionMap.put(alias.getAlias().getIdString().toLowerCase(), alias.getParseLocationRange().start());
 
-      // If the query expression is a SELECT statement, visit the FROM clause.
-      if (alias.getQuery().getQueryExpr() instanceof ASTSelect){
-        ASTTablePathExpression tablePathExp = (ASTTablePathExpression)((ASTSelect) alias.getQuery().getQueryExpr()).getFromClause().getTableExpression();
-        visit(tablePathExp);
-      }
-    });
+              // If the query expression is a SELECT statement, visit the FROM clause.
+              if (alias.getQuery().getQueryExpr() instanceof ASTSelect) {
+                ASTTablePathExpression tablePathExp =
+                    (ASTTablePathExpression)
+                        ((ASTSelect) alias.getQuery().getQueryExpr())
+                            .getFromClause()
+                            .getTableExpression();
+                visit(tablePathExp);
+              }
+            });
   }
 
-
-  public void visit(ASTTablePathExpression tablePathExpression){
+  public void visit(ASTTablePathExpression tablePathExpression) {
 
     // Loop through all the identifiers in the table path expression.
-    tablePathExpression.getPathExpr().getNames().forEach(identifier -> {
+    tablePathExpression
+        .getPathExpr()
+        .getNames()
+        .forEach(
+            identifier -> {
 
-      // Get the identifier as a string in lower case.
-      String table = identifier.getIdString().toLowerCase();
+              // Get the identifier as a string in lower case.
+              String table = identifier.getIdString().toLowerCase();
 
-      // If the count map contains the identifier, increment its count.
-      if(cteCountMap.containsKey(table)){
-        cteCountMap.put(table,cteCountMap.get(table) + 1);
-      }
-    });
+              // If the count map contains the identifier, increment its count.
+              if (cteCountMap.containsKey(table)) {
+                cteCountMap.put(table, cteCountMap.get(table) + 1);
+              }
+            });
 
     // Loop through all the entries in the count map.
     for (Map.Entry<String, Integer> entry : cteCountMap.entrySet()) {
@@ -63,7 +97,8 @@ public class IdentifyCTEsEvalMultipleTimesVisitor extends ParseTreeVisitor {
 
       // If the CTE count is greater than 1, add the suggestion message to the list.
       if (count > 1) {
-        result.add(String.format(MULTIPLE_CTE_SUGGESTION_MESSAGE,cteName,count));
+        int lineNum = ZetaSQLStringParsingHelper.countLine(query, cteStartPositionMap.get(cteName));
+        result.add(String.format(MULTIPLE_CTE_SUGGESTION_MESSAGE, cteName, lineNum, count));
       }
     }
   }

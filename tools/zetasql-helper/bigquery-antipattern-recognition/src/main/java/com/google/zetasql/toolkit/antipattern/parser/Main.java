@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.zetasql.toolkit.antipattern.parser;
 
 import com.google.zetasql.LanguageOptions;
@@ -36,7 +52,7 @@ public class Main {
 
       try {
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
-        String rec = getRecommendations(parsedQuery);
+        String rec = getRecommendations(parsedQuery, query);
         if (rec.length() > 0) {
           addRecToOutput(cmdParser, outputData, inputQuery, rec);
           OutputGenerator.writeOutput(cmdParser, outputData);
@@ -48,10 +64,14 @@ public class Main {
       countQueries += 1;
     }
 
-    logger.info("Processing finished."
-        + "Queries read: {}. "
-        + "Queries with anti-patterns: {}. "
-        + "Queries that could not be parsed: {}.", countQueries, countAntiPatterns, countErrors);
+    logger.info(
+        "Processing finished."
+            + "Queries read: {}. "
+            + "Queries with anti-patterns: {}. "
+            + "Queries that could not be parsed: {}.",
+        countQueries,
+        countAntiPatterns,
+        countErrors);
   }
 
   private static void addRecToOutput(
@@ -72,13 +92,13 @@ public class Main {
     }
   }
 
-  private static String getRecommendations(ASTStatement parsedQuery) {
+  private static String getRecommendations(ASTStatement parsedQuery, String query) {
     ArrayList<String> recommendation = new ArrayList<>();
     recommendation.add(new IdentifySimpleSelectStar().run(parsedQuery));
-    recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery));
-    recommendation.add(new IdentifyCrossJoin().run(parsedQuery));
-    recommendation.add(new IdentifyCTEsEvalMultipleTimes().run(parsedQuery));
-    recommendation.add(new IdentifyOrderByWithoutLimit().run(parsedQuery));
+    recommendation.add(new IdentifyInSubqueryWithoutAgg().run(parsedQuery, query));
+    recommendation.add(new IdentifyCrossJoin().run(parsedQuery, query));
+    recommendation.add(new IdentifyCTEsEvalMultipleTimes().run(parsedQuery, query));
+    recommendation.add(new IdentifyOrderByWithoutLimit().run(parsedQuery, query));
     recommendation.add(new IdentifyRegexpContains().run(parsedQuery));
     return recommendation.stream().filter(x -> x.length() > 0).collect(Collectors.joining("\n"));
   }

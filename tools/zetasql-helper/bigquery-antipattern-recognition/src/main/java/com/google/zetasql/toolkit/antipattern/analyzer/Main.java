@@ -1,16 +1,27 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.zetasql.toolkit.antipattern.analyzer;
 
 import com.google.api.client.util.DateTime;
 import com.google.zetasql.AnalyzerOptions;
 import com.google.zetasql.LanguageOptions;
-import com.google.zetasql.toolkit.antipattern.analyzer.BasePatternDetector;
-import com.google.zetasql.toolkit.antipattern.analyzer.IdentidySelectedColumns;
-import com.google.zetasql.toolkit.antipattern.analyzer.IdentifyCrossJoin;
-import com.google.zetasql.toolkit.antipattern.analyzer.IdentifySubqueryInWhere;
+import com.google.zetasql.toolkit.ZetaSQLToolkitAnalyzer;
 import com.google.zetasql.toolkit.antipattern.cmd.BQAntiPatternCMDParser;
 import com.google.zetasql.toolkit.antipattern.cmd.InputQuery;
-import com.google.zetasql.toolkit.antipattern.util.BigQueryHelper;
-import com.google.zetasql.toolkit.ZetaSQLToolkitAnalyzer;
 import com.google.zetasql.toolkit.catalog.bigquery.BigQueryCatalog;
 import com.google.zetasql.toolkit.options.BigQueryLanguageOptions;
 import java.util.ArrayList;
@@ -39,12 +50,15 @@ public class Main {
     // create BQ catalog
     BigQueryCatalog catalog = new BigQueryCatalog(processingProject);
 
-
     BQAntiPatternCMDParser bqAntiPatternCMDParser = new BQAntiPatternCMDParser(args);
-    Iterator<InputQuery> inputQueryIterator =  bqAntiPatternCMDParser.getInputQueries();
+    Iterator<InputQuery> inputQueryIterator = bqAntiPatternCMDParser.getInputQueries();
 
-    processQueries(catalog, options, analyzer, inputQueryIterator, bqAntiPatternCMDParser.getProcessingProject());
-
+    processQueries(
+        catalog,
+        options,
+        analyzer,
+        inputQueryIterator,
+        bqAntiPatternCMDParser.getProcessingProject());
   }
 
   private static void populateAntiPatterList() {
@@ -68,14 +82,13 @@ public class Main {
 
       catalog.addAllTablesUsedInQuery(query, options);
 
-
-      antiPatterList.forEach(antiPatter ->{
-        String rec = antiPatter.run(query, catalog, analyzer);
-        if(rec.length()>0){
-          recommendationsList.add(rec);
-        }
-      });
-
+      antiPatterList.forEach(
+          antiPatter -> {
+            String rec = antiPatter.run(query, catalog, analyzer);
+            if (rec.length() > 0) {
+              recommendationsList.add(rec);
+            }
+          });
 
       String recommendations = String.join("\n", recommendationsList);
       recommendationsList.clear();
@@ -89,7 +102,7 @@ public class Main {
       rowContent.put("recommendation", recommendations);
       rowContent.put("process_timestamp", new DateTime(new Date()));
 
- //     BigQueryHelper.writeResults(outputProjectId, rowContent);
+      //     BigQueryHelper.writeResults(outputProjectId, rowContent);
     }
   }
 }

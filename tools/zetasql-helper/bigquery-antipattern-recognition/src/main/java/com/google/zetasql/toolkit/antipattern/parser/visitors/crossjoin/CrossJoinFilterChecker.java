@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.zetasql.toolkit.antipattern.parser.visitors.crossjoin;
 
 import com.google.zetasql.parser.ASTNodes;
@@ -9,14 +25,14 @@ public class CrossJoinFilterChecker extends ParseTreeVisitor {
   boolean foundFilterForCrossJoin;
   CrossJoin crossJoin;
 
-  public void setCrossJoin(
-      CrossJoin crossJoin) {
+  public void setCrossJoin(CrossJoin crossJoin) {
     this.crossJoin = crossJoin;
   }
 
   public void visit(ASTNodes.ASTBinaryExpression node) {
-    if(node.getOp().toString().equals("EQ")) {
-      if(node.getLhs() instanceof ASTPathExpression && node.getRhs() instanceof ASTPathExpression ) {
+    if (node.getOp().toString().equals("EQ")) {
+      if (node.getLhs() instanceof ASTPathExpression
+          && node.getRhs() instanceof ASTPathExpression) {
         checkFilter(node);
       }
     }
@@ -33,7 +49,7 @@ public class CrossJoinFilterChecker extends ParseTreeVisitor {
     String tempLeftTable = null;
     String tempRightTable = null;
 
-    if(crossJoin.getLeft().getTableNameList().contains(lhsFilterTableName)) {
+    if (crossJoin.getLeft().getTableNameList().contains(lhsFilterTableName)) {
       foundFilterLeftSideOfJoin = true;
       tempLeftTable = lhsFilterTableName;
     } else if (crossJoin.getLeft().getTableNameList().contains(rhsFilterTableName)) {
@@ -41,7 +57,7 @@ public class CrossJoinFilterChecker extends ParseTreeVisitor {
       tempLeftTable = rhsFilterTableName;
     }
 
-    if(crossJoin.getRight().getTableNameList().contains(lhsFilterTableName)) {
+    if (crossJoin.getRight().getTableNameList().contains(lhsFilterTableName)) {
       foundFilterRightSideOfJoin = true;
       tempRightTable = lhsFilterTableName;
     } else if (crossJoin.getRight().getTableNameList().contains(rhsFilterTableName)) {
@@ -54,11 +70,9 @@ public class CrossJoinFilterChecker extends ParseTreeVisitor {
       crossJoin.addTableName(tempLeftTable);
       crossJoin.addTableName(tempRightTable);
     }
-
   }
 
   public boolean result() {
     return foundFilterForCrossJoin;
   }
-
 }
