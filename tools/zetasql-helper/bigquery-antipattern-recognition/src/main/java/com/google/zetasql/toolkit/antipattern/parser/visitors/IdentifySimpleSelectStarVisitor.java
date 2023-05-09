@@ -22,7 +22,6 @@ import com.google.zetasql.parser.ParseTreeVisitor;
 import java.util.ArrayList;
 import com.google.zetasql.toolkit.antipattern.util.ZetaSQLStringParsingHelper;
 
-
 public class IdentifySimpleSelectStarVisitor extends ParseTreeVisitor {
 
   private final String SUGGESTION_MESSAGE =
@@ -34,7 +33,6 @@ public class IdentifySimpleSelectStarVisitor extends ParseTreeVisitor {
   private boolean isSimpleSelect = true;
   private ArrayList<String> result = new ArrayList<String>();
   private String query;
-
   public IdentifySimpleSelectStarVisitor(String query) {
     this.query = query;
   }
