@@ -19,61 +19,86 @@ public class IdentifyRegexpContainsTest {
     }
 
     @Test
-    public void regexContainsOnly() {
-        String expected = "REGEXP_CONTAINS : Prefer LIKE when the full power of regex is not needed (e.g. wildcard matching).";
+    public void regexContainsOnlyTest() {
+        String expected = "REGEXP_CONTAINS at line 3. Prefer LIKE when the full power of regex is not needed (e.g. wildcard matching).";
         String query =
-                "select dim1 from `dataset.table` where regexp_contains(dim1, '.*test.*')";
+            "select dim1 \n"
+                + "from `dataset.table` \n"
+                + "where regexp_contains(dim1, '.*test.*')";
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
-        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery);
+        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery, query);
         assertEquals(expected, recommendations);
     }
 
     @Test
-    public void regexContainsWithOtherFuncs() {
-        String expected = "REGEXP_CONTAINS : Prefer LIKE when the full power of regex is not needed (e.g. wildcard matching).";
+    public void regexContainsWithOtherFuncsTest() {
+        String expected = "REGEXP_CONTAINS at line 5. Prefer LIKE when the full power of regex is not needed (e.g. wildcard matching).";
         String query =
-                "select dim1 from `dataset.table` where effective_start_dte = current_date() and dim2 = 'x' and regexp_contains(dim1, '.*test.*')";
+            "select dim1 \n"
+                + "from `dataset.table` \n"
+                + "where effective_start_dte = current_date() \n"
+                + "and dim2 = 'x' \n"
+                + "and regexp_contains(dim1, '.*test.*')";
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
-        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery);
+        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery, query);
         assertEquals(expected, recommendations);
     }
 
     @Test
-    public void withoutRegexContains() {
+    public void multipleRegexpTest() {
+        String expected = "REGEXP_CONTAINS at line 5. Prefer LIKE when the full power of regex is not needed (e.g. wildcard matching).\n"
+            + "REGEXP_CONTAINS at line 7. Prefer LIKE when the full power of regex is not needed (e.g. wildcard matching).";
+        String query =
+            "select dim1 \n"
+                + "from `dataset.table` \n"
+                + "where effective_start_dte = current_date() \n"
+                + "and dim2 = 'x' \n"
+                + "and regexp_contains(dim1, '.*test.*')\n"
+                + "and col1 = 1 \n"
+                + "and regexp_contains(dim2, '.*test.*')";
+        ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
+        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery, query);
+        assertEquals(expected, recommendations);
+    }
+
+    @Test
+    public void withoutRegexContainsTest() {
         String expected = "";
         String query =
-                "select dim1 from `dataset.table` where effective_start_dte = current_date()";
+            "select dim1 \n"
+                + "from `dataset.table` \n"
+                + "where effective_start_dte = current_date()";
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
-        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery);
+        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery, query);
         assertEquals(expected, recommendations);
     }
 
     @Test
-    public void otherFunc() {
+    public void otherFuncTest() {
         String expected = "";
         String query =
-                "select dim1 from `dataset.table` where effective_start_dte = current_date() and lower(\"Sunday\") = day_of_week";
+            "select dim1 \n"
+                + "from `dataset.table` \n"
+                + "where effective_start_dte = current_date() \n"
+                + "and lower(\"Sunday\") = day_of_week";
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
-        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery);
+        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery, query);
         assertEquals(expected, recommendations);
     }
 
     @Test
-    public void regexpContainWith() {
-        String expected = "REGEXP_CONTAINS : Prefer LIKE when the full power of regex is not needed (e.g. wildcard matching).";
+    public void regexpContainWithTest() {
+        String expected = "REGEXP_CONTAINS at line 4. Prefer LIKE when the full power of regex is not needed (e.g. wildcard matching).";
         String query =
-                "with a as (select dim1 from `dataset.table` where effective_start_dte = current_date() and regexp_contains(dim1, '.*test.*') and lower('Sunday') = day_of_week) select * from a";
+            "with a as (select \n"
+                + "dim1 from `dataset.table` \n"
+                + "where effective_start_dte = current_date() \n"
+                + "and regexp_contains(dim1, '.*test.*') \n"
+                + "and lower('Sunday') = day_of_week) \n"
+                + "select * from a";
         ASTStatement parsedQuery = Parser.parseStatement(query, languageOptions);
-        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery);
+        String recommendations = (new IdentifyRegexpContains()).run(parsedQuery, query);
         assertEquals(expected, recommendations);
     }
 
 }
-/*
-Test cases
-1. Regexp_contains only = "select dim1 from `dataset.table` where regexp_contains(dim1, '.*test.*')" - REGEX PATTERN
-2. Regexp_contains with other functions = "select dim1 from `dataset.table` where effective_start_dte = current_date() and dim2 = 'x' and regexp_contains(dim1, '.*test.*')" - REGEX PATTERN
-3. Query without regexp_contains = "select dim1 from `dataset.table` where effective_start_dte = current_date()" - NO_PATTERN
-4. Query with other functions but regexp_contains = "select dim1 from `dataset.table` where effective_start_dte = current_date() and lower("Sunday") = day_of_week" - NO_PATTERN
-5. Regexp_contains inside complex query where clause = "with a as (select dim1 from `dataset.table` where effective_start_dte = current_date() and regexp_contains(dim1, '.*test.*') and lower('Sunday') = day_of_week) select * from a "
- */

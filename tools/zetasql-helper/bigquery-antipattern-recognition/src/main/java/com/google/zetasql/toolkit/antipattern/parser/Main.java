@@ -99,7 +99,7 @@ public class Main {
     recommendation.add(new IdentifyCrossJoin().run(parsedQuery, query));
     recommendation.add(new IdentifyCTEsEvalMultipleTimes().run(parsedQuery, query));
     recommendation.add(new IdentifyOrderByWithoutLimit().run(parsedQuery, query));
-    recommendation.add(new IdentifyRegexpContains().run(parsedQuery));
+    recommendation.add(new IdentifyRegexpContains().run(parsedQuery, query));
     return recommendation.stream().filter(x -> x.length() > 0).collect(Collectors.joining("\n"));
   }
 }
